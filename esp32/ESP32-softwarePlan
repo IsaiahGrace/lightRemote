@@ -1,0 +1,30 @@
+Function graph:
+main()─┬─wakeup_leds()───irq_led_info()
+       ├─network_connect()───enter_manually()
+       ├─led_configure()
+       ├─input_configure()
+       ├─mqtt_configure()
+       └─main_loop()─┬─irq_led_update()
+                     └─irq_read_inputs()
+
+LED State flows (2 seconds each, irq reads from array and updates 60 times per second)
+        0 - wakeup(slow green fade in)
+        1 - wifi-connected(flash green)
+        2 - no-wifi-found(flash red)
+        3 - mqtt-connected(flash gold)
+
+
+irq_led_info()
+        looks at two global variables:
+                info_msg
+                info_index
+        updates every 1/60th of a second
+        will incriment index, but never > 119
+        to send a new message, just set:
+                info_msg = new value
+                THEN
+                info_index = 0
+        the last entry (info[*][119]) should always be:
+                ((0,0,0),(0,0,0))
+        will set the LEDs to the value specified by:
+        info[msg][index] = ((r1,g1,b1),(r2,g2,b2))
