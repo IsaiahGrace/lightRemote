@@ -51,7 +51,10 @@ def scan_networks():
 			network_name = network[0].decode()
 			network_passwd = saved_networks_dict[network_name]
 			return True
-
+		
+	print("Could not find a known network")
+	network_name = None
+	network_passwd = None
 	return False
 
 def connect():
@@ -109,7 +112,7 @@ def prompt_user_network():
 	global saved_networks_dict
 	# If we haven't found a known network, prompt the user to enter the name and password
 	
-	print("Could not find a known network")
+	
 
 	while network_name == "" or network_name == None:
 		print("Please enter a network from the list below: (enter an empty name to re-scan)")
