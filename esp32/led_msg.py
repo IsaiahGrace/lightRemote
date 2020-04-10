@@ -4,8 +4,8 @@
 
 # This module is an attempt to replace led_info.py with a more memory efficient implimentation
 
-#from machine import Timer, Pin
-#import neopixel
+from machine import Timer, Pin
+import neopixel
 
 # The color arguments should be indexable in the form (r,g,b)
 # each color value must be an int between 0-255
@@ -14,108 +14,162 @@
 # This gives an update frequency of 50Hz for the LEDs, plenty good for what we're up to.
 
 # Global refrences to resources
-__timer__ = None
-__leds__ = [0,0]
+TIMER = None
+LEDS = [0,0]
 
-__LED1__ = (0,0,0)
-__LED2__ = (0,0,0)
-__LED1_STEP__ = (0,0,0)
-__LED2_STEP__ = (0,0,0)
+LED1 = (0,0,0)
+LED2 = (0,0,0)
+LED1_STEP = (0,0,0)
+LED2_STEP = (0,0,0)
 
 # fade MSG state
-__RISE__ = 0
-__FALL__ = 0
-__RISE_SCALE__ = 0
-__FALL_SCALE__ = 0
+RISE = 0
+FALL = 0
+RISE_SCALE = 0
+FALL_SCALE = 0
 
 # flash MSG state
-__HIGH__ = 0
-__LOW__ = 0
-__DUR__ = 0
+HIGH = 0
+LOW = 0
+DUR = 0
+STATE = False
+RED = (40,0,0)
+GREEN = (0,40,0)
+BLUE = (0,0,40)
 
 # MSG active
-__active__ = False
+ACTIVE = False
 
 def is_active():
-	return __active__
+	return ACTIVE
 
 def stop_all():
-	global __active__
-	if not __active__:
+	global ACTIVE
+	if not ACTIVE:
 		return
 
-	__timer__.deinit()
-	__leds__[0] = (0,0,0)
-	__leds__[1] = (0,0,0)
-	__leds__.write()
-	__active__ = False
+	TIMER.deinit()
+	LEDS[0] = (0,0,0)
+	LEDS[1] = (0,0,0)
+	LEDS.write()
+	ACTIVE = False
 
-def fade_msg(color1, color2=None, rise_time_ms=1000, fall_time_ms=1000):
-	global __LED1__
-	global __LED2__
-	global __LED1_STEP__
-	global __LED2_STEP__
-	global __RISE__
-	global __FALL__
-	global __RISE_SCALE__
-	global __FALL_SCALE__
-	global __leds__
-	global __timer__
-	global __active__
+def fade_msg(color1, color2=None):
+	global LED1
+	global LED2
+	global LED1_STEP
+	global LED2_STEP
+	global RISE
+	global FALL
+	global RISE_SCALE
+	global FALL_SCALE
+	global LEDS
+	global TIMER
+	global ACTIVE
 
 	# Okay, we've got to do some serious figuring out to make a smooth transition to any color
 	# We can't do any floating point arithmetic inside the IRQ, so instead we will multiply
 	# all numbers by 1000, which will give us a little more resoltion
-	__LED1__ = [0,0,0]
-	__LED2__ = [0,0,0]
-	__LED1_STEP__ = color1
-	__LED2_STEP__ = color2 if color2 != None else color1
-	__RISE__ = rise_time_ms
-	__FALL__ = fall_time_ms
-	__RISE_SCALE__ = rise_time_ms // 20
-	__FALL_SCALE__ = fall_time_ms // 20
-	#__leds__ = neopixel.NeoPixel(Pin(14),2)
-	#__timer__ = Timer(1)
-	#__timer__.init(period=20, mode=Timer.PERIODIC, callback=irq_fade_msg)
-	__active__ = True
+	LED1 = [0,0,0]
+	LED2 = [0,0,0]
+	LED1_STEP = color1
+	LED2_STEP = color2 if color2 != None else color1
+	RISE = rise_time_ms
+	FALL = fall_time_ms
+	RISE_SCALE = rise_time_ms // 20
+	FALL_SCALE = fall_time_ms // 20
+	LEDS = neopixel.NeoPixel(Pin(14),2)
+	TIMER = Timer(1)
+	TIMER.init(period=20, mode=Timer.PERIODIC, callback=irq_fade_msg)
+	ACTIVE = True
 	
 def irq_fade_msg(arg1):
-	global __LED1__
-	global __LED2__
-	global __LED1_STEP__
-	global __LED2_STEP__
-	global __RISE__
-	global __FALL__
-	global __RISE_SCALE__
-	global __FALL_SCALE__
-	global __leds__
-	global __timer__
-	global __active__
+	global LED1
+	global LED2
+	global LED1_STEP
+	global LED2_STEP
+	global RISE
+	global FALL
+	global RISE_SCALE
+	global FALL_SCALE
+	global LEDS
+	global TIMER
+	global ACTIVE
 	
-	if __RISE__ > 20:
-		__RISE__ = __RISE__ - 20
-		__LED1__ = __LED1__ + __LED1_STEP__
-		__LED2__ = __LED2__ + __LED2_STEP__
-		__leds__[0] = __LED1__ // __RISE_SCALE__
-		__leds__[1] = __LED2__ // __RISE_SCALE__		
-	elif __FALL__ > 20:
-		__FALL__ = __FALL__ - 20
-		__LED1__ = __LED1__ - __LED1_STEP__
-		__LED2__ = __LED2__ - __LED2_STEP__
-		__leds__[0] = __LED1__ // __FALL_SCALE__
-		__leds__[1] = __LED2__ // __FALL_SCALE__
+	if RISE > 20:
+		RISE = RISE - 20
+		LED1 = LED1 + LED1_STEP
+		LED2 = LED2 + LED2_STEP
+		LEDS[0] = LED1 // RISE_SCALE
+		LEDS[1] = LED2 // RISE_SCALE		
+	elif FALL > 20:
+		FALL = FALL - 20
+		LED1 = LED1 - LED1_STEP
+		LED2 = LED2 - LED2_STEP
+		LEDS[0] = LED1 // FALL_SCALE
+		LEDS[1] = LED2 // FALL_SCALE
 	else:
-		__leds__[0] = [0,0,0]
-		__leds__[1] = [0,0,0]
-		#__timer__.deinit()
-		__active__ = False
-	#__leds__.write()
+		LEDS[0] = [0,0,0]
+		LEDS[1] = [0,0,0]
+		#TIMER.deinit()
+		ACTIVE = False
+	#LEDS.write()
 	
 	
 
-def flash_msg(color1, color2=None, high_time_ms=500, low_time_ms=500, duration_ms=2000):
+def flash_msg(color1, color2=None, period_ms=500,  duration_ms=2000):
+	global TIMER
+	global LEDS
+	global ACTIVE
+	global PERIOD
+	global DURATION
+	global STATE
+	global LED1
+	global LED2
+	if ACTIVE :
+		print("ERROR, led_msg is still active, cannot start new message yet")
+		return
+
 	if color2 == None:
 		color2 = color1
 
+	LED1 = color1
+	LED2 = color2
+	PERIOD = period_ms
+	DURATION = duration_ms
+	STATE = False
+
+	LEDS = neopixel.NeoPixel(Pin(14),2)
+	TIMER = Timer(1)
+	TIMER.init(period=PERIOD, mode=Timer.PERIODIC, callback=irq_flash_msg)
+	ACTIVE = True
+
 def irq_flash_msg(arg1):
-	pass
+	global LEDS
+	global TIMER
+	global LED1
+	global LED2
+	global PERIOD
+	global DURATION
+	global STATE
+	global ACTIVE
+
+	if DURATION < PERIOD:
+		STATE = True
+		ACTIVE = False
+		TIMER.deinit()
+
+	if STATE:
+		LEDS[0] = (0,0,0)
+		LEDS[1] = (0,0,0)
+	else:
+		LEDS[0] = LED1
+		LEDS[1] = LED2
+
+	LEDS.write()
+	
+	STATE = not STATE
+
+	DURATION = DURATION - PERIOD
+
+	

@@ -1,0 +1,3 @@
+[submodule "esp32/micropython-waveshare-epaper"]
+	path = esp32/micropython-waveshare-epaper
+	url = git@github.com:mcauser/micropython-waveshare-epaper.git
