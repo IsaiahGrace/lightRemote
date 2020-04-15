@@ -1,0 +1,196 @@
+Start Wakeup @ Tue Feb 19 06:45:01 2019
+Max brightness @ Tue Feb 19 07:02:00 2019
+Shutdown @ Tue Feb 19 07:30:01 2019
+--------------------
+Start Wakeup @ Wed Feb 20 07:45:01 2019
+Max brightness @ Wed Feb 20 08:02:00 2019
+Shutdown @ Wed Feb 20 08:30:02 2019
+--------------------
+Start Wakeup @ Thu Feb 21 09:00:02 2019
+Max brightness @ Thu Feb 21 09:17:00 2019
+Shutdown @ Thu Feb 21 09:45:02 2019
+--------------------
+Start Wakeup @ Fri Feb 22 07:45:02 2019
+Max brightness @ Fri Feb 22 08:02:00 2019
+Shutdown @ Fri Feb 22 08:30:02 2019
+--------------------
+Start Wakeup @ Mon Feb 25 07:45:02 2019
+Max brightness @ Mon Feb 25 08:02:01 2019
+Shutdown @ Mon Feb 25 08:30:02 2019
+--------------------
+Start Wakeup @ Tue Feb 26 06:45:01 2019
+Max brightness @ Tue Feb 26 07:02:00 2019
+Shutdown @ Tue Feb 26 07:30:01 2019
+--------------------
+Start Wakeup @ Wed Feb 27 07:45:01 2019
+Max brightness @ Wed Feb 27 08:02:00 2019
+Shutdown @ Wed Feb 27 08:30:01 2019
+--------------------
+Start Wakeup @ Thu Feb 28 09:00:02 2019
+Max brightness @ Thu Feb 28 09:17:00 2019
+Shutdown @ Thu Feb 28 09:45:02 2019
+--------------------
+Start Wakeup @ Fri Mar  1 07:45:02 2019
+Max brightness @ Fri Mar  1 08:02:00 2019
+Shutdown @ Fri Mar  1 08:30:02 2019
+--------------------
+Start Wakeup @ Mon Mar  4 07:45:01 2019
+Max brightness @ Mon Mar  4 08:02:00 2019
+Shutdown @ Mon Mar  4 08:30:02 2019
+--------------------
+Start Wakeup @ Tue Mar  5 06:45:01 2019
+Max brightness @ Tue Mar  5 07:02:00 2019
+Shutdown @ Tue Mar  5 07:30:01 2019
+--------------------
+Start Wakeup @ Wed Mar  6 07:45:01 2019
+Max brightness @ Wed Mar  6 08:02:00 2019
+Shutdown @ Wed Mar  6 08:30:01 2019
+--------------------
+Start Wakeup @ Thu Mar  7 09:00:01 2019
+Max brightness @ Thu Mar  7 09:17:00 2019
+Shutdown @ Thu Mar  7 09:45:01 2019
+--------------------
+Start Wakeup @ Fri Mar  8 07:45:01 2019
+Max brightness @ Fri Mar  8 08:02:00 2019
+Shutdown @ Fri Mar  8 08:30:02 2019
+--------------------
+Start Wakeup @ Mon Mar 18 07:45:01 2019
+Max brightness @ Mon Mar 18 08:02:00 2019
+Shutdown @ Mon Mar 18 08:30:02 2019
+--------------------
+Start Wakeup @ Tue Mar 19 06:45:01 2019
+Max brightness @ Tue Mar 19 07:02:00 2019
+Shutdown @ Tue Mar 19 07:30:01 2019
+--------------------
+Start Wakeup @ Wed Mar 20 07:45:02 2019
+Max brightness @ Wed Mar 20 08:02:00 2019
+Shutdown @ Wed Mar 20 08:30:02 2019
+--------------------
+Start Wakeup @ Thu Mar 21 09:00:01 2019
+Max brightness @ Thu Mar 21 09:17:00 2019
+Shutdown @ Thu Mar 21 09:45:02 2019
+--------------------
+Start Wakeup @ Fri Mar 22 07:45:01 2019
+Max brightness @ Fri Mar 22 08:02:00 2019
+Shutdown @ Fri Mar 22 08:30:02 2019
+--------------------
+Start Wakeup @ Mon Mar 25 07:45:01 2019
+Max brightness @ Mon Mar 25 08:02:00 2019
+Shutdown @ Mon Mar 25 08:30:02 2019
+--------------------
+Start Wakeup @ Tue Mar 26 06:45:02 2019
+Max brightness @ Tue Mar 26 07:02:00 2019
+Shutdown @ Tue Mar 26 07:30:02 2019
+--------------------
+Start Wakeup @ Wed Mar 27 07:45:01 2019
+Max brightness @ Wed Mar 27 08:02:00 2019
+Shutdown @ Wed Mar 27 08:30:01 2019
+--------------------
+Start Wakeup @ Thu Mar 28 09:00:01 2019
+Max brightness @ Thu Mar 28 09:17:00 2019
+Shutdown @ Thu Mar 28 09:45:02 2019
+--------------------
+Start Wakeup @ Fri Mar 29 07:45:02 2019
+Max brightness @ Fri Mar 29 08:02:01 2019
+Shutdown @ Fri Mar 29 08:30:02 2019
+--------------------
+Start Wakeup @ Mon Apr  1 07:45:01 2019
+Max brightness @ Mon Apr  1 08:02:00 2019
+Shutdown @ Mon Apr  1 08:30:02 2019
+--------------------
+Start Wakeup @ Tue Apr  2 06:45:01 2019
+Max brightness @ Tue Apr  2 07:02:00 2019
+Shutdown @ Tue Apr  2 07:30:02 2019
+--------------------
+Start Wakeup @ Wed Apr  3 07:45:02 2019
+Max brightness @ Wed Apr  3 08:02:00 2019
+Shutdown @ Wed Apr  3 08:30:02 2019
+--------------------
+Start Wakeup @ Thu Apr  4 09:00:01 2019
+Max brightness @ Thu Apr  4 09:17:00 2019
+Shutdown @ Thu Apr  4 09:45:02 2019
+--------------------
+Start Wakeup @ Fri Apr  5 07:45:01 2019
+Max brightness @ Fri Apr  5 08:02:00 2019
+Shutdown @ Fri Apr  5 08:30:02 2019
+--------------------
+Start Wakeup @ Mon Apr  8 07:45:02 2019
+Max brightness @ Mon Apr  8 08:02:00 2019
+Shutdown @ Mon Apr  8 08:30:02 2019
+--------------------
+Start Wakeup @ Tue Apr  9 06:45:02 2019
+Max brightness @ Tue Apr  9 07:02:01 2019
+Shutdown @ Tue Apr  9 07:30:02 2019
+--------------------
+Start Wakeup @ Wed Apr 10 07:45:01 2019
+Max brightness @ Wed Apr 10 08:02:00 2019
+Shutdown @ Wed Apr 10 08:30:01 2019
+--------------------
+Start Wakeup @ Thu Apr 11 09:00:01 2019
+Max brightness @ Thu Apr 11 09:17:00 2019
+Shutdown @ Thu Apr 11 09:45:02 2019
+--------------------
+Start Wakeup @ Fri Apr 12 07:45:01 2019
+Max brightness @ Fri Apr 12 08:02:00 2019
+Shutdown @ Fri Apr 12 08:30:02 2019
+--------------------
+Start Wakeup @ Mon Apr 15 07:45:02 2019
+Max brightness @ Mon Apr 15 08:02:00 2019
+Shutdown @ Mon Apr 15 08:30:02 2019
+--------------------
+Start Wakeup @ Tue Apr 16 06:45:01 2019
+Max brightness @ Tue Apr 16 07:02:00 2019
+Shutdown @ Tue Apr 16 07:30:01 2019
+--------------------
+Start Wakeup @ Wed Apr 17 07:45:01 2019
+Max brightness @ Wed Apr 17 08:02:00 2019
+Shutdown @ Wed Apr 17 08:30:02 2019
+--------------------
+Start Wakeup @ Thu Apr 18 09:00:01 2019
+Max brightness @ Thu Apr 18 09:17:00 2019
+Shutdown @ Thu Apr 18 09:45:01 2019
+--------------------
+Start Wakeup @ Fri Apr 19 07:45:01 2019
+Max brightness @ Fri Apr 19 08:02:00 2019
+Shutdown @ Fri Apr 19 08:30:02 2019
+--------------------
+Start Wakeup @ Mon Apr 22 07:45:01 2019
+Max brightness @ Mon Apr 22 08:02:00 2019
+Shutdown @ Mon Apr 22 08:30:01 2019
+--------------------
+Start Wakeup @ Tue Apr 23 06:45:01 2019
+Max brightness @ Tue Apr 23 07:02:00 2019
+Shutdown @ Tue Apr 23 07:30:02 2019
+--------------------
+Start Wakeup @ Wed Apr 24 07:45:01 2019
+Max brightness @ Wed Apr 24 08:02:00 2019
+Shutdown @ Wed Apr 24 08:30:02 2019
+--------------------
+Start Wakeup @ Thu Apr 25 09:00:01 2019
+Max brightness @ Thu Apr 25 09:17:00 2019
+Shutdown @ Thu Apr 25 09:45:01 2019
+--------------------
+Start Wakeup @ Fri Apr 26 07:45:01 2019
+Max brightness @ Fri Apr 26 08:02:00 2019
+Shutdown @ Fri Apr 26 08:30:02 2019
+--------------------
+Start Wakeup @ Mon Apr 29 07:45:01 2019
+Max brightness @ Mon Apr 29 08:02:00 2019
+Shutdown @ Mon Apr 29 08:30:01 2019
+--------------------
+Start Wakeup @ Tue Apr 30 06:45:01 2019
+Max brightness @ Tue Apr 30 07:02:00 2019
+Shutdown @ Tue Apr 30 07:30:02 2019
+--------------------
+Start Wakeup @ Wed May  1 07:45:01 2019
+Max brightness @ Wed May  1 08:02:00 2019
+Shutdown @ Wed May  1 08:30:01 2019
+--------------------
+Start Wakeup @ Thu May  2 09:00:01 2019
+Max brightness @ Thu May  2 09:17:00 2019
+Shutdown @ Thu May  2 09:45:02 2019
+--------------------
+Start Wakeup @ Fri May  3 07:45:01 2019
+Max brightness @ Fri May  3 08:02:00 2019
+Shutdown @ Fri May  3 08:30:01 2019
+--------------------

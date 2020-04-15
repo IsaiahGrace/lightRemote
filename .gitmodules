@@ -1,3 +1,11 @@
 [submodule "esp32/micropython-waveshare-epaper"]
 	path = esp32/micropython-waveshare-epaper
 	url = git@github.com:mcauser/micropython-waveshare-epaper.git
+	
+[submodule "pi/from_old_pi/lights/rpi-ws281x-python"]
+	path = pi/from_old_pi/lights/rpi-ws281x-python
+	url = https://github.com/rpi-ws281x/rpi-ws281x-python
+
+[submodule "pi/from_old_pi/lights/rpi_ws281x"]
+	path = pi/from_old_pi/lights/rpi_ws281x
+	url = https://github.com/jgarff/rpi_ws281x
