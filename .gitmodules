@@ -9,3 +9,6 @@
 [submodule "pi/C++_driver/rpi_ws281x"]
 	path = pi/C++_driver/rpi_ws281x
 	url = https://github.com/jgarff/rpi_ws281x
+[submodule "desktop"]
+	path = desktop
+	url = ./desktop
