@@ -9,6 +9,7 @@
 [submodule "pi/C++_driver/rpi_ws281x"]
 	path = pi/C++_driver/rpi_ws281x
 	url = https://github.com/jgarff/rpi_ws281x
-[submodule "desktop"]
-	path = desktop
-	url = ./desktop
+
+[submodule "desktop/musical_lights"]
+	path = desktop/musical_lights
+	url = https://github.com/IsaiahGrace/musical_lights
