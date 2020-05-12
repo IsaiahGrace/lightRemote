@@ -12,4 +12,4 @@
 
 [submodule "desktop/musical_lights"]
 	path = desktop/musical_lights
-	url = https://github.com/IsaiahGrace/musical_lights
+	url = git@github.com:IsaiahGrace/musical_lights.git
