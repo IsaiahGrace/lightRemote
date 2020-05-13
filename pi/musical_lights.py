@@ -237,12 +237,14 @@ def lighting_control_client():
                 # If the song has just stopped, we should still update the lights for one minute
                 # This allows the lights to turn off gradually
                 sleep_mode = 0
-                start_time = time()
+                #start_time = time()
                 slowVariations(strip, mutationRate, mutationStep, baseColor, boundSize)
-                end_time = time()
-                print("start:", start_time)
-                print("end  :", end_time)
-                print("time :", str(end_time - start_time))
+                #end_time = time()
+                #print("start:", start_time)
+                #print("end  :", end_time)
+                #print("time :", str(end_time - start_time))
+                
+                # Looks like the Pi Zero W usually takes 0.06 or 0.07 seconds
             else:
                 # The song is not playing and it has been more than one minute.
                 # Enter sleep mode so that we are no longer updating the light colors
