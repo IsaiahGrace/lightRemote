@@ -178,15 +178,15 @@ def mutateColor(color, mutationRate, mutationStep):
 
 def lighting_control_client():
     # The overall control client for the LED lights.
-    #print colored('Starting up lighting control client: ' + ctime(), 'blue')
-    print 'Starting up lighting control client: ' + ctime()
+    #print(colored('Starting up lighting control client: ' + ctime(), 'blue'))
+    print('Starting up lighting control client: ' + ctime())
 
     # Initilize the PixelStrip
     strip = PixelStrip(LED_COUNT, LED_PIN, LED_FREQ_HZ, LED_DMA, LED_INVERT, LED_BRIGHTNESS, LED_CHANNEL)
     strip.begin()
 
     # Set some starting parameters
-    track_file = '/home/pi/Documents/lights/current_song'
+    track_file = './current_song' #'/home/pi/Documents/lights/current_song'
     modified_time = time()
     mutationRate = 0 # This is set inside the loop. This is an initial value
     mutationStep = 2 # Tweak this to change how fast the lights mutate
@@ -214,8 +214,8 @@ def lighting_control_client():
 
                 if audio_features['is_playing']:
                     # The track is currently playing and we should update the lights                    
-                    #print colored(audio_features['name'] + ' -- ' + audio_features['artist'], 'green')
-                    print audio_features['name'] + ' -- ' + audio_features['artist']
+                    #print(colored(audio_features['name'] + ' -- ' + audio_features['artist'], 'green'))
+                    print(audio_features['name'] + ' -- ' + audio_features['artist'])
 
                     # Get a new baseColor for the song
                     baseColor = getColorFromValence(audio_features['valence'])
@@ -231,8 +231,8 @@ def lighting_control_client():
                     baseColor = 0
                     boundSize = 0
                     mutationRate = 0
-                    #print colored('No track currently playing','red')
-                    print 'No track currently playing'
+                    #print(colored('No track currently playing','red'))
+                    print('No track currently playing')
 
             if audio_features['is_playing'] or time() - modified_time < 60 or readingMode:
                 # The song is playing or has recently stopped.
@@ -253,8 +253,8 @@ def lighting_control_client():
                 else:
                     clear_strip(strip)
                     
-                #print colored(message, 'red')
-                #print message
+                #print(colored(message, 'red'))
+                #print(message)
                 
                 sleep_mode = sleep_mode + 1
 
@@ -270,8 +270,8 @@ def lighting_control_client():
         
     except KeyboardInterrupt:
         clear_strip(strip)
-        #print colored('\nShutting down lighting control client:' + ctime(), 'blue')
-        print 'Shutting down lighting control client:' + ctime()
+        #print(colored('\nShutting down lighting control client:' + ctime(), 'blue'))
+        print('Shutting down lighting control client:' + ctime())
     
 if __name__ == "__main__":
     if len(sys.argv) > 1 and sys.argv[1] == '-q':
