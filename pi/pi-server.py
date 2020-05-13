@@ -12,6 +12,7 @@ import signal
 import sys
 import os
 import sched
+import pprint
 #from termcolor import colored    
 
 #import stripDriver
@@ -72,25 +73,33 @@ class PiServer():
         self.scheduler = sched.scheduler(time.time, time.sleep)
         #                delay, priority
         self.scheduler.enter(1, 1, self.read_all_signals)
+        
 
     def read_all_signals(self):
         # for each of the signal names, and their coresponding data dicts:
         for sig, sigData in self.signals.items():
             # Check if the file has been modified since we last looked
-            if sigData[time] != os.path.getmtime(SIGNAL_PATH + sig):
+            if sigData['time'] != os.path.getmtime(self.SIGNAL_PATH + sig):
                 # does mutating a Dict while iterating through it bork the universe?
-                self.signals[sig][message] = self.read_signal(signal)
-                self.signals[sig][time] = os.path.getmtime(SIGNAL_PATH + sig)
+                self.signals[sig]['message'] = self.read_signal(sig)
+                self.signals[sig]['time'] = os.path.getmtime(self.SIGNAL_PATH + sig)
+
+        # The scheduler is not periodic, so we have to re-schedule ourselves if we want to execute again
+        self.scheduler.enter(1, 1, self.read_all_signals)
+
         
     def read_signal(self, signal):
-        with open("./signals/" + signal, "r") as f:
+        with open(self.SIGNAL_PATH + signal, "r") as f:
             message = json.load(f)
         return message
-    
-    def status(self):
-        # print out some status information
-        print(self.scheduler.queue())
 
+    
+    def scheduler_status(self):
+        # print out some status information
+        print(self.scheduler.queue)
+        #pprint.pprint(self.signals)
+        
+        
     
     
         
@@ -100,7 +109,6 @@ if __name__ == "__main__":
 
     server = PiServer()
 
-    while(True):
-        PiServer.status()
-        sleep(1.66)
+    # The scheduler is blocking, so this is our infinite loop:
+    server.scheduler.run()
 
