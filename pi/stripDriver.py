@@ -136,3 +136,25 @@ class StripDriver():
         if color < base_color - bound_size:
             return color + 1
         return color
+
+
+    def print_colors(self):
+        # This is some unicode magic that wont work with all terminals, etc...
+        strip_length = self.strip.numPixels()
+        i = 0
+        printout = []
+        while(i < strip_length):
+            pixel_color = self.strip.getPixelColor(i)
+            
+            # Extract the R G B values for this pixel from the packed 24 bit color
+            red   = (0xFF0000 & pixel_color) >> 16
+            green = (0x00FF00 & pixel_color) >> 8
+            blue  = (0x0000FF & pixel_color)
+            
+            printout.append('\x1B[38;2;' + red + ';' + green + ';' + blue +'m\u2588')
+            i = i + 1
+            if i % 10 == 0:
+                printout.append('\n')
+
+        print(''.join(printout))
+

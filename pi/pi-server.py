@@ -110,7 +110,7 @@ class PiServer():
     
     SIGNAL_PATH = '/home/pi/lightRemote/pi/signals/'
     
-    def __init__(self, verbose=False, timing=False):
+    def __init__(self, verbose=False, timing=False, printout=False):
         self.verbose = verbose
         self.timing = timing
 
@@ -130,6 +130,9 @@ class PiServer():
         
         if self.timing:
             self.scheduler_status()
+
+        if self.printout:
+            self.print_colors()
                 
         
     def read_all_signals(self):
@@ -227,6 +230,9 @@ class PiServer():
         
 
     def update_delta(self, name):
+        if not self.timing:
+            return
+        
         curr_time = time.time()
         # The time since we last called this function:
         self.deltas[name]['delta'] = curr_time - self.deltas[name]['time']
@@ -245,6 +251,14 @@ class PiServer():
         self.scheduler.enter(2, 1, self.scheduler_status)
         
 
+    def print_colors(self):
+        for strip in strips:
+            print(strip)
+            self.strips[strip].print_colors()
+
+        self.scheduler.enter(1, 1, self.print_colors)
+
+        
     def nop(self):
         # This is needed so that signal actions can always be callable even if there is nothing to do
         pass    
@@ -254,7 +268,7 @@ if __name__ == "__main__":
     if len(sys.argv) > 1 and sys.argv[1] == '-q':
         sys.stdout = open(os.devnull, 'w')
 
-    server = PiServer(timing=False, verbose=True)
+    server = PiServer(timing=False, verbose=True, printout=True)
 
     # The scheduler is blocking, so this is our infinite loop:
     server.scheduler.run()
