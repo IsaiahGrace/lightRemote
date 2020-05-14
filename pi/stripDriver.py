@@ -58,7 +58,7 @@ class StripDriver():
     def clear(self):
         # DOES NOT TRANSMIT NEW COLORS TO STRIP
         # refresh is needed after this to actually turn off the lights
-        for i in range(strip.numPixels()):
+        for i in range(self.strip.numPixels()):
             self.strip.setPixelColorRGB(i,0,0,0)
 
                 
@@ -101,7 +101,7 @@ class StripDriver():
             
     def mutate_color(self, color, mutation_rate, mutationStep):
         # Applies a random mutation to each pixel, allowing a natural variation between pixel colors
-        mutated_color = [0,0,0]
+        mutated_color = list(color)
         
         # This arithmetic means we only need one call to random in order to generate all three random numbers
         rand = random.randint(0,10000000)

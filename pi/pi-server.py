@@ -110,8 +110,9 @@ class PiServer():
     
     SIGNAL_PATH = '/home/pi/lightRemote/pi/signals/'
     
-    def __init__(self, verbose):
+    def __init__(self, verbose=False, timing=False):
         self.verbose = verbose
+        self.timing = timing
 
         for signal in self.signals:
             self.signals[signal]['action'] = self.nop
@@ -127,7 +128,7 @@ class PiServer():
         self.signal_actions()
         self.refresh_strips()
         
-        if verbose:
+        if self.timing:
             self.scheduler_status()
                 
         
@@ -172,7 +173,7 @@ class PiServer():
             pass
 
         # The monsterous OR part of this if makes sure we update the fan valence when a new song starts
-        if sig == 'fan' or(self.signals['music']['message']['is_playing'] and self.signals['fan']['message']):
+        if sig == 'fan' or self.signals['fan']['message']:
             if self.signals['fan']['message']['fan_on']:
                 if self.signals['fan']['message']['mode'] == 'MUSIC':
                     if self.signals['music']['message']['is_playing']:
@@ -253,7 +254,7 @@ if __name__ == "__main__":
     if len(sys.argv) > 1 and sys.argv[1] == '-q':
         sys.stdout = open(os.devnull, 'w')
 
-    server = PiServer(verbose=True)
+    server = PiServer(timing=False, verbose=True)
 
     # The scheduler is blocking, so this is our infinite loop:
     server.scheduler.run()
