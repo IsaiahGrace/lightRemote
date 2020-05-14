@@ -52,14 +52,14 @@ class StripDriver():
         
     def refresh(self):
         # This transmits data to the LED strip to set the color of each LED according to the strip array
-        strip.show()
-
+        self.strip.show()
+        
         
     def clear(self):
         # DOES NOT TRANSMIT NEW COLORS TO STRIP
         # refresh is needed after this to actually turn off the lights
         for i in range(strip.numPixels()):
-            strip.setPixelColorRGB(i,0,0,0)
+            self.strip.setPixelColorRGB(i,0,0,0)
 
                 
     def set_base_color_from_valence(self, valence):
@@ -88,12 +88,12 @@ class StripDriver():
                            (0x0000FF & pixel_color))
             
             # Mutate each of the colors to find a new color value for the pixel
-            pixel_color = mutate_color(pixel_color, self.mutation_rate, self.mutation_step)
+            pixel_color = self.mutate_color(pixel_color, self.mutation_rate, self.mutation_step)
             
             # Apply the limiting bound on the new pixel color
-            red   = apply_bound(pixel_color[0], self.base_red,   self.tolerance)
-            green = apply_bound(pixel_color[1], self.base_green, self.tolerance)
-            blue  = apply_bound(pixel_color[2], self.base_blue,  self.tolerance)
+            red   = self.apply_bound(pixel_color[0], self.base_red,   self.tolerance)
+            green = self.apply_bound(pixel_color[1], self.base_green, self.tolerance)
+            blue  = self.apply_bound(pixel_color[2], self.base_blue,  self.tolerance)
             
             # Update the color of this pixel
             self.strip.setPixelColorRGB(i, red, green, blue)
@@ -114,22 +114,20 @@ class StripDriver():
             if mutation[i] < mutation_rate:
                 # Apply the color mutation, either increase or decrease the color
                 if mutation[i] % 2 == 0:
-                    color = color + mutationStep
+                    mutated_color[i] = color[i] + mutationStep
                 else:
-                    color = color - mutationStep
+                    mutated_color[i] = color[i] - mutationStep
 
                 # Make sure the mutated color is within 0 - 255
-                if color > 255:
-                    color = 255
-                if color < 0:
-                    color = 0
-
-                mutated_color[i] = color
-            
-        return color
+                if mutated_color[i] > 255:
+                    mutated_color[i] = 255
+                if mutated_color[i] < 0:
+                    mutated_color[i] = 0
+                    
+        return mutated_color
 
     
-    def apply_bound(self.color, base_color, bound_size):
+    def apply_bound(self, color, base_color, bound_size):
         # Applies the bound on a particular color value (0 - 255).
         # If the color is outside the allowed bound, gently push it towards the bound.
         # This allows the lights to turn on/off change colors from song to song gradually
