@@ -114,10 +114,6 @@ class PiServer():
         self.verbose = verbose
         self.timing = timing
         self.printout = printout
-        if self.printout:
-            self.timing = False
-            self.verbose = False
-            print('\x1Bc',end='')
 
         for signal in self.signals:
             self.signals[signal]['action'] = self.nop
@@ -257,12 +253,14 @@ class PiServer():
         
 
     def print_colors(self):
-        print('\x1B[1;1H',end='')
+        message = ''
         for strip in self.strips:
-            print(strip)
-            self.strips[strip].print_colors()
+            message = message + strip + '\n' + self.strips[strip].print_colors() + '\n'
 
-        self.scheduler.enter(0.2, 1, self.print_colors)
+        with open(self.SIGNAL_PATH + 'printout','w') as f:
+            f.write(message)
+            
+        self.scheduler.enter(1, 1, self.print_colors)
 
         
     def nop(self):

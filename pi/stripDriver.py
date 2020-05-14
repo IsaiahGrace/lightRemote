@@ -144,6 +144,9 @@ class StripDriver():
         i = 0
         printout = []
         while(i < strip_length):
+            if i % 10 == 0:
+                printout.append('\n')
+
             pixel_color = self.strip.getPixelColor(i)
             
             # Extract the R G B values for this pixel from the packed 24 bit color
@@ -152,10 +155,9 @@ class StripDriver():
             blue  = str(0x0000FF & pixel_color)
             
             printout.append('\x1B[38;2;' + red + ';' + green + ';' + blue +'m\u2588')
-            i = i + 1
-            if i % 10 == 0:
-                printout.append('\n')
 
-        printout.append('\x1B[m')
-        print(''.join(printout))
+            i = i + 1
+
+        printout.append('\n\x1B[m')
+        return ''.join(printout)
 
