@@ -150,6 +150,8 @@ class PiServer():
                 
                 if self.verbose:
                     print('Recieved', sig, 'signal')
+                    if sig == 'music' and self.signals['music']['message']['is_playing']:
+                        print(self.signals['music']['message']['name'], '--', self.signals['music']['message']['artist'])
 
         # The scheduler is not periodic, so we have to re-schedule ourselves if we want to execute again
         self.scheduler.enter(self.deltas['read_all_signals']['delay'], 1, self.read_all_signals)
