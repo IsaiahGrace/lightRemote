@@ -206,13 +206,8 @@ class PiServer():
                     pass
                 if self.signals['fan']['message']['mode'] == 'NOTIFY':
                     pass
-                
-            else:
-                self.strips['top_fan'].clear()
-                self.strips['bottom_fan'].clear()
-                self.signals['fan']['action'] = self.nop
-        
-        
+    
+    
     def signal_actions(self):
         self.update_delta('signal_actions')
 

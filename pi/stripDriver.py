@@ -49,10 +49,19 @@ class StripDriver():
         # maximum values for S and V create more vivid and intense colors, and are a good choice with these cheep LEDs
         self.hsv_S = 1
         self.hsv_V = 1
-        
+
+        # This will allow us to detect when all the lights are off, and we don't have to bother doing all the music effects
+        self.idle = False
+
+
+    def is_idle(self):
+        return self.idle
+
+    
     def refresh(self):
         # This transmits data to the LED strip to set the color of each LED according to the strip array
-        self.strip.show()
+        if not self.idle:
+            self.strip.show()
         
         
     def clear(self):
@@ -61,7 +70,7 @@ class StripDriver():
         for i in range(self.strip.numPixels()):
             self.strip.setPixelColorRGB(i,0,0,0)
 
-                
+
     def set_base_color_from_valence(self, valence):
         # Takes a valence value (0 - 1) describing the song and returns a color mapping of that value, with the hue_offset applied
         # The offset shifts 
@@ -79,8 +88,22 @@ class StripDriver():
         self.base_blue = blue
     
     def music_effect(self):
+        if self.base_red or self.base_green or self.base_blue or self.tolerance:
+            self.idle = False
+            
+        if self.idle:
+            return
+
+        # If all the lights are off, this will remain True through the updates
+        all_off = True
+                
         for i in range(self.strip.numPixels()):
             pixel_color = self.strip.getPixelColor(i)
+
+            # If a pixel_color is nonzero, than not all lights are off
+
+            if pixel_color:
+                all_off = False
             
             # Extract the R G B values for this pixel from the packed 24 bit color
             pixel_color = ((0xFF0000 & pixel_color) >> 16,
@@ -97,6 +120,8 @@ class StripDriver():
             
             # Update the color of this pixel
             self.strip.setPixelColorRGB(i, red, green, blue)
+
+            self.idle = all_off
             
             
     def mutate_color(self, color, mutation_rate, mutationStep):
