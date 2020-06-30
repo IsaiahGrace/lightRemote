@@ -59,9 +59,11 @@ class StripDriver():
 
     
     def refresh(self):
+        if self.base_red or self.base_green or self.base_blue or self.tolerance:
+            self.idle = False
+
         # This transmits data to the LED strip to set the color of each LED according to the strip array
-        if not self.idle:
-            self.strip.show()
+        self.strip.show()
         
         
     def clear(self):
@@ -90,7 +92,7 @@ class StripDriver():
     def music_effect(self):
         if self.base_red or self.base_green or self.base_blue or self.tolerance:
             self.idle = False
-            
+
         if self.idle:
             return
 
@@ -99,11 +101,6 @@ class StripDriver():
                 
         for i in range(self.strip.numPixels()):
             pixel_color = self.strip.getPixelColor(i)
-
-            # If a pixel_color is nonzero, than not all lights are off
-
-            if pixel_color:
-                all_off = False
             
             # Extract the R G B values for this pixel from the packed 24 bit color
             pixel_color = ((0xFF0000 & pixel_color) >> 16,
@@ -121,7 +118,12 @@ class StripDriver():
             # Update the color of this pixel
             self.strip.setPixelColorRGB(i, red, green, blue)
 
-            self.idle = all_off
+            # If a pixel_color is nonzero, than not all lights are off
+            if red or green or blue:
+                all_off = False
+
+        self.idle = all_off
+        #and not self.base_red and not self.base_green and not self.base_blue and not self.tolerance
             
             
     def mutate_color(self, color, mutation_rate, mutationStep):
