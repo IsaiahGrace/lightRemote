@@ -115,6 +115,8 @@ class PiServer():
         self.timing = timing
         self.printout = printout
 
+        self.idle = True
+        
         for signal in self.signals:
             self.signals[signal]['action'] = self.nop
         
@@ -126,19 +128,22 @@ class PiServer():
         # Each of these functions schedule themselves after their execution,
         # so we just need to run them this first time, and they'll keep themselves running.
         self.read_all_signals()
-        self.signal_actions()
-        self.refresh_strips()
+
+        # because of the idle functionality, read_all_signals will take us out of the default idle state,
+        # and call these functions as needed
+        #self.signal_actions()
+        #self.refresh_strips()
         
         if self.timing:
             self.scheduler_status()
 
-        if self.printout:
-            self.print_colors()
+        #if self.printout:
+           #self.print_colors()
                 
         
     def read_all_signals(self):
         self.update_delta('read_all_signals')
-        
+
         # for each of the signal names, and their coresponding data dicts:
         for sig, sigData in self.signals.items():
             # Check if the file has been modified since we last looked
@@ -147,9 +152,22 @@ class PiServer():
                 self.signals[sig]['message'] = self.read_signal(sig)
                 self.signals[sig]['mtime'] = os.path.getmtime(self.SIGNAL_PATH + sig)
                 self.update_action(sig)
+
+                # We've just read a new signal, and the pi-server is in the idle state,
+                # So it's time to start our refresh_strips, and signal_actions scheduled tasks
+                # refresh_strips is the function in charge of determining idle status, so we MUST call it first
+                # (Otherwise signal_actions will see that the pi-server is inactive and WONT re-schedule itself)
+                if self.idle:
+                    self.idle = False
+                    self.refresh_strips()
+                    self.signal_actions()
+                    if self.printout:
+                        self.print_colors()
                 
                 if self.verbose:
                     print('Recieved', sig, 'signal')
+                    if sig == 'music' and self.signals['music']['message']['is_playing']:
+                        print(self.signals['music']['message']['name'], '--', self.signals['music']['message']['artist'])
 
         # The scheduler is not periodic, so we have to re-schedule ourselves if we want to execute again
         self.scheduler.enter(self.deltas['read_all_signals']['delay'], 1, self.read_all_signals)
@@ -204,30 +222,37 @@ class PiServer():
                     pass
                 if self.signals['fan']['message']['mode'] == 'NOTIFY':
                     pass
-                
-            else:
-                self.strips['top_fan'].clear()
-                self.strips['bottom_fan'].clear()
-                self.signals['fan']['action'] = self.nop
-        
-        
+    
+    
     def signal_actions(self):
         self.update_delta('signal_actions')
 
         for signal in self.signals:
             self.signals[signal]['action']()
 
-        self.scheduler.enter(self.deltas['signal_actions']['delay'], 2, self.signal_actions)
+        if not self.idle:
+            self.scheduler.enter(self.deltas['signal_actions']['delay'], 2, self.signal_actions)
         
     def refresh_strips(self):
         # I'd love to get my own function name during runtime programatically,
         # But you can't do that in Python! (without bodging the stack)
         self.update_delta('refresh_strips')
+
+        all_idle = True
         
         for strip in self.strips.values():
             strip.refresh()
-            
-        self.scheduler.enter(self.deltas['refresh_strips']['delay'], 3, self.refresh_strips)
+
+            if not strip.is_idle():
+                all_idle = False
+
+        # If all the strips are idle, we can set the entire pi-server to the idle state
+        self.idle = all_idle
+
+        # Only re-schedule ourselves if the pi-server is NOT in the idle state
+        # read_all_signals will be responsible for calling refresh_strips if we go active again
+        if not self.idle:
+            self.scheduler.enter(self.deltas['refresh_strips']['delay'], 3, self.refresh_strips)
         
 
     def update_delta(self, name):
@@ -244,8 +269,9 @@ class PiServer():
             
     def scheduler_status(self):
         # print out some status information
-        #pp(self.scheduler.queue)
-        pp(self.deltas)
+        pp(self.scheduler.queue)
+        print(self.idle)
+        #pp(self.deltas)
         #for delta in self.deltas:
         #    print(delta, ":", self.deltas[delta]['delta'])
 
@@ -260,7 +286,8 @@ class PiServer():
         with open(self.SIGNAL_PATH + 'printout','w') as f:
             f.write(message)
             
-        self.scheduler.enter(1, 1, self.print_colors)
+        if not self.idle:    
+            self.scheduler.enter(1, 1, self.print_colors)
 
         
     def nop(self):
@@ -272,7 +299,7 @@ if __name__ == "__main__":
     if len(sys.argv) > 1 and sys.argv[1] == '-q':
         sys.stdout = open(os.devnull, 'w')
 
-    server = PiServer(timing=False, verbose=True, printout=True)
+    server = PiServer(timing=False, verbose=False, printout=True)
 
     # The scheduler is blocking, so this is our infinite loop:
     server.scheduler.run()
