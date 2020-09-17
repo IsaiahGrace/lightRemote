@@ -244,7 +244,7 @@ def lighting_control_client():
                 #print("end  :", end_time)
                 #print("time :", str(end_time - start_time))
                 
-                # Looks like the Pi Zero W usually takes 0.06 or 0.07 seconds
+                # Looks like the Pi Zero W usually takes 0.06 or 0.07 seconds (14-16 Hz)
             else:
                 # The song is not playing and it has been more than one minute.
                 # Enter sleep mode so that we are no longer updating the light colors
