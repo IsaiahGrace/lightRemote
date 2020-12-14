@@ -299,7 +299,7 @@ if __name__ == "__main__":
     if len(sys.argv) > 1 and sys.argv[1] == '-q':
         sys.stdout = open(os.devnull, 'w')
 
-    server = PiServer(timing=False, verbose=False, printout=True)
+    server = PiServer(timing=False, verbose=False, printout=False)
 
     # The scheduler is blocking, so this is our infinite loop:
     server.scheduler.run()
