@@ -1,0 +1,14 @@
+# This service file was in the folder:
+# /lib/systemd/system/musical-lights.service 
+[Unit]
+Description=The python driver for the addressable LED lights
+After=local-fs.target
+
+[Service]
+Type=simple
+WorkingDirectory=/home/pi/lightRemote/pi
+ExecStart=/home/pi/lightRemote/pi/pi-server.py
+#Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
