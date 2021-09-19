@@ -4,6 +4,7 @@
 import colorsys
 import random
 import rpi_ws281x
+import threading
 
 
 class StripDriver():
@@ -18,6 +19,9 @@ class StripDriver():
             config['CHANNEL']
         )
         self.strip.begin()
+
+        # This lock will hopefully help prevent white flashing
+        self.strip_lock = threading.Lock()
 
         # This is the color that pixels will gravitate towards
         self.base_red = 0 # range 0 - 255
@@ -63,7 +67,9 @@ class StripDriver():
             self.idle = False
 
         # This transmits data to the LED strip to set the color of each LED according to the strip array
-        self.strip.show()
+        with self.strip_lock:
+            print(self.print_colors()[1:],end='')
+            self.strip.show()
         
         
     def clear(self):
@@ -98,29 +104,29 @@ class StripDriver():
 
         # If all the lights are off, this will remain True through the updates
         all_off = True
-                
-        for i in range(self.strip.numPixels()):
-            pixel_color = self.strip.getPixelColor(i)
+        with self.strip_lock:
+            for i in range(self.strip.numPixels()):
+                pixel_color = self.strip.getPixelColor(i)
             
-            # Extract the R G B values for this pixel from the packed 24 bit color
-            pixel_color = ((0xFF0000 & pixel_color) >> 16,
-                           (0x00FF00 & pixel_color) >> 8,
-                           (0x0000FF & pixel_color))
+                # Extract the R G B values for this pixel from the packed 24 bit color
+                pixel_color = ((0xFF0000 & pixel_color) >> 16,
+                               (0x00FF00 & pixel_color) >> 8,
+                               (0x0000FF & pixel_color))
             
-            # Mutate each of the colors to find a new color value for the pixel
-            pixel_color = self.mutate_color(pixel_color, self.mutation_rate, self.mutation_step)
+                # Mutate each of the colors to find a new color value for the pixel
+                pixel_color = self.mutate_color(pixel_color, self.mutation_rate, self.mutation_step)
             
-            # Apply the limiting bound on the new pixel color
-            red   = self.apply_bound(pixel_color[0], self.base_red,   self.tolerance)
-            green = self.apply_bound(pixel_color[1], self.base_green, self.tolerance)
-            blue  = self.apply_bound(pixel_color[2], self.base_blue,  self.tolerance)
+                # Apply the limiting bound on the new pixel color
+                red   = self.apply_bound(pixel_color[0], self.base_red,   self.tolerance)
+                green = self.apply_bound(pixel_color[1], self.base_green, self.tolerance)
+                blue  = self.apply_bound(pixel_color[2], self.base_blue,  self.tolerance)
             
-            # Update the color of this pixel
-            self.strip.setPixelColorRGB(i, red, green, blue)
+                # Update the color of this pixel
+                self.strip.setPixelColorRGB(i, red, green, blue)
 
-            # If a pixel_color is nonzero, than not all lights are off
-            if red or green or blue:
-                all_off = False
+                # If a pixel_color is nonzero, than not all lights are off
+                if red or green or blue:
+                    all_off = False
 
         self.idle = all_off
         #and not self.base_red and not self.base_green and not self.base_blue and not self.tolerance

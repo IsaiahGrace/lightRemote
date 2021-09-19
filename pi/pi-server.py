@@ -35,7 +35,7 @@ class PiServer():
     # TODO: Should I use a different DMA channel for each LED strip?
     strip_config = {
         'external': {
-            'COUNT'      : 150,     # Number of LED pixels. 36 on bottom, 38, on side, 150 total
+            'COUNT'      : 15,     # Number of LED pixels. 36 on bottom, 38, on side, 150 total
             'PIN'        : 10,      # GPIO pin connected to the pixels (10 uses SPI /dev/spidev0.0).
             'FREQ_HZ'    : 800000,  # LED signal frequency in hertz (usually 800khz)
             'DMA'        : 10,      # DMA channel to use for generating signal (try 10)
@@ -232,7 +232,8 @@ class PiServer():
 
         if not self.idle:
             self.scheduler.enter(self.deltas['signal_actions']['delay'], 2, self.signal_actions)
-        
+
+            
     def refresh_strips(self):
         # I'd love to get my own function name during runtime programatically,
         # But you can't do that in Python! (without bodging the stack)
@@ -286,6 +287,8 @@ class PiServer():
         with open(self.SIGNAL_PATH + 'printout','w') as f:
             f.write(message)
             
+        print(message)
+        
         if not self.idle:    
             self.scheduler.enter(1, 1, self.print_colors)
 
