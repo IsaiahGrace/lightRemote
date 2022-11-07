@@ -13,3 +13,6 @@
 [submodule "desktop/musical_lights"]
 	path = desktop/musical_lights
 	url = git@github.com:IsaiahGrace/musical_lights.git
+[submodule "lib/rpi_ws281x"]
+	path = lib/rpi_ws281x
+	url = git@github.com:jgarff/rpi_ws281x.git

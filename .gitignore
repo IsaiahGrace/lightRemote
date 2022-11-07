@@ -2,3 +2,7 @@ __pycache__
 *~
 \#*\#
 *.pyc
+build
+zig-out
+zig-cache
+a.out
