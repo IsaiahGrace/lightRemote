@@ -55,9 +55,9 @@ class FSM:
                 h=audio["valence"],
                 s=1.0,
                 v=1.0,
-                dh=0.2,
-                ds=0.2,
-                dv=0.2,
+                dh=0.1,
+                ds=0.1,
+                dv=0.1,
             )
         )
         return self.idle
