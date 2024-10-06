@@ -23,6 +23,8 @@ class FSM:
                 "item": {"id": None},
                 "is_playing": False,
             }
+        if not self.track["item"]:
+            self.track["item"] = {"id": None}
 
     def run(self):
         state = self.stop_playback
@@ -34,7 +36,7 @@ class FSM:
 
         self.fetch_track()
 
-        if not self.playing and self.track["is_playing"]:
+        if not self.playing and self.track["is_playing"] and self.track["item"]["id"]:
             self.playing = True
             return self.start_playback
 
@@ -59,7 +61,7 @@ class FSM:
                 h=audio["valence"],
                 s=1.0,
                 v=1.0,
-                dh=0.1,
+                dh=0.05,
                 ds=0.2,
                 dv=0.2,
                 t=0.5,
@@ -69,7 +71,8 @@ class FSM:
 
     def stop_playback(self):
         print("stop playback")
-        self.lights.set_params(params.Params())
+        # We set the hue tolerance to 1 so that the pixels retain their hue as they turn off.
+        self.lights.set_params(params.Params(dh=1.0))
         return self.idle
 
 

@@ -8,13 +8,13 @@ import threading
 
 window_size = 1000
 fps = 60
-delta = 1.0 / 300.0
+delta = 1.0 / 1000.0
 num_pixels = 400
 
 
 class LightSim:
     def __init__(self):
-        self.hue = [0] * num_pixels
+        self.hue = [random.random() for _ in range(num_pixels)]
         self.sat = [0] * num_pixels
         self.val = [0] * num_pixels
 
@@ -30,7 +30,6 @@ class LightSim:
         self.thread.start()
 
     def set_params(self, params):
-        print(params)
         self.param_updates.put(params)
 
     def run(self):
@@ -62,14 +61,12 @@ class LightSim:
             pass
 
     def update_pixels(self):
-        # if self.frame % 60 == 0:
-        #     print(f"hue: {self.hue[0]:0.4f}, sat: {self.sat[0]:0.4f}, val: {self.val[0]:0.4f}")
-
         for component, target, tolerance, wraps in (
             (self.hue, self.params.h, self.params.dh, True),
             (self.sat, self.params.s, self.params.ds, False),
             (self.val, self.params.v, self.params.dv, False),
         ):
+            inverse_target = (target + 0.5) % 1
             for i in range(len(component)):
                 c = component[i]
                 if random.random() < self.params.t:
@@ -78,14 +75,22 @@ class LightSim:
                     else:
                         c -= delta
 
+                # Sometimes the fastest way to get to the target is to decriment
+                # the hue, and wrap around from 0 -> 1. The "inverse target" is
+                # the opposite point on the hue circle. By adding or subtracting
+                # 1, we make the comparisons below simpler. Because we wrap the
+                # values at the end of this function, the offset here doesn't
+                # effect the final value.
                 if wraps:
-                    # TODO: Write this logic
-                    pass
-                else:
-                    if c > target + tolerance:
-                        c -= delta
-                    if c < target - tolerance:
-                        c += delta
+                    if inverse_target > target and c > inverse_target:
+                        c -= 1
+                    elif inverse_target < target and c < inverse_target:
+                        c += 1
+
+                if c > target + tolerance:
+                    c -= delta * 0.5
+                if c < target - tolerance:
+                    c += delta * 0.5
 
                 if wraps:
                     c %= 1
@@ -111,12 +116,47 @@ class LightSim:
         self.draw_preview()
         self.draw_hs_plot()
         self.draw_vs_plot()
+        self.draw_h_line()
 
         rl.draw_text(f"Hue\n\n{self.params.h:0.4f}", 5, 5, 30, rl.DARKGRAY)
         rl.draw_rectangle_v([window_size // 2 - 5, 0], [10, window_size], rl.LIGHTGRAY)
         rl.draw_rectangle_v([0, window_size // 2 - 5], [window_size, 10], rl.LIGHTGRAY)
 
         rl.end_drawing()
+
+    def draw_h_line(self):
+        for r, g, b, h in zip(self.red, self.green, self.blue, self.hue):
+            rl.draw_circle(540 + int(h * 440), 900, 6, [r, g, b, 255])
+
+        # main axis, ticks at 0 & 1
+        rl.draw_line_v([540 - 10, 920], [540 + 440 + 10, 920], rl.LIGHTGRAY)
+        rl.draw_line_v([540, 910], [540, 930], rl.LIGHTGRAY)
+        rl.draw_line_v([540 + 440, 910], [540 + 440, 930], rl.LIGHTGRAY)
+        rl.draw_text("0", 540, 940, 30, rl.DARKGRAY)
+        rl.draw_text("1", 540 + 430, 940, 30, rl.DARKGRAY)
+
+        # Hue target value
+        rl.draw_line_v([540 + int(440 * self.params.h), 910], [540 + int(440 * self.params.h), 930], rl.DARKGRAY)
+        rl.draw_text(f"{self.params.h:0.4f}", 500 + int(440 * self.params.h), 940, 30, rl.DARKGRAY)
+
+        # Hue bounds:
+        rl.draw_line_v(
+            [540 + int(440 * ((self.params.h - self.params.dh) % 1)), 910],
+            [540 + int(440 * ((self.params.h - self.params.dh) % 1)), 930],
+            rl.DARKGRAY,
+        )
+        rl.draw_line_v(
+            [540 + int(440 * ((self.params.h + self.params.dh) % 1)), 910],
+            [540 + int(440 * ((self.params.h + self.params.dh) % 1)), 930],
+            rl.DARKGRAY,
+        )
+
+        # Opposite Hue
+        rl.draw_line_v(
+            [540 + int(440 * ((self.params.h + 0.5) % 1)), 890],
+            [540 + int(440 * ((self.params.h + 0.5) % 1)), 930],
+            rl.BLACK,
+        )
 
     def draw_vs_plot(self):
         for r, g, b, s, v in zip(self.red, self.green, self.blue, self.sat, self.val):
