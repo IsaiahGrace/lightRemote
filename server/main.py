@@ -13,8 +13,16 @@ class FSM:
     def __init__(self, spotipy):
         self.sp = spotipy
         self.playing = False
+        self.lights = lights.Lights()
+        self.fetch_track()
+
+    def fetch_track(self):
         self.track = self.sp.current_playback()
-        self.lights = lights.Lights(400)
+        if not self.track:
+            self.track = {
+                "item": {"id": None},
+                "is_playing": False,
+            }
 
     def run(self):
         state = self.stop_playback
@@ -22,11 +30,9 @@ class FSM:
             state = state()
 
     def idle(self):
-        # print("fsm idle")
-
         old_track_id = self.track["item"]["id"]
 
-        self.track = self.sp.current_playback()
+        self.fetch_track()
 
         if not self.playing and self.track["is_playing"]:
             self.playing = True
@@ -39,25 +45,24 @@ class FSM:
         if old_track_id != self.track["item"]["id"]:
             return self.start_playback
 
-        # progress = self.track["progress_ms"] / self.track["item"]["duration_ms"]
-        # remaining_ms = self.track["item"]["duration_ms"] - self.track["progress_ms"]
-        # print(f"{progress:.4f} {remaining_ms}")
-
         time.sleep(1)
         return self.idle
 
     def start_playback(self):
-        # print("fsm start playback")
         audio = self.sp.audio_features(self.track["item"]["id"])[0]
-        print(f"[bold green]{self.track['item']['name']}[/bold green]")
+        track_name = self.track["item"]["name"]
+        artists = ", ".join(artist["name"] for artist in self.track["item"]["artists"])
+        album = self.track["item"]["album"]["name"]
+        print(f"[bold][green]{track_name}[/green] : [blue]{album}[/blue] : [cyan]{artists}[/cyan][/bold]")
         self.lights.set_params(
             params.Params(
                 h=audio["valence"],
                 s=1.0,
                 v=1.0,
                 dh=0.1,
-                ds=0.1,
-                dv=0.1,
+                ds=0.2,
+                dv=0.2,
+                t=0.5,
             )
         )
         return self.idle
@@ -77,7 +82,13 @@ def main(args):
     sp = spotipy.Spotify(auth_manager=SpotifyOAuth(scope=scope))
 
     fsm = FSM(sp)
-    fsm.run()
+    try:
+        fsm.run()
+    except KeyboardInterrupt:
+        raise
+    except:
+        print(fsm.track)
+        raise
 
 
 if __name__ == "__main__":
