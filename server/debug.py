@@ -7,32 +7,34 @@ import random
 import threading
 
 window_size = 1000
-fps = 60
-delta = 1.0 / 2000.0
-num_pixels = 400
-scaling_root = 2
+
+config = params.Config(
+    delta=(1.0 / 2000.0),
+    num_pixels=400,
+    scaling_root=2.0,
+)
 
 
-class LightSim:
+class Display:
     def __init__(self):
-        self.hue_vel = [random.random() for _ in range(num_pixels)]
-        self.linear_sat_vel = [0] * num_pixels
-        self.linear_val_vel = [0] * num_pixels
-
-        self.linear_sat = [0] * num_pixels
-        self.linear_val = [0] * num_pixels
-
-        self.hue = [0] * num_pixels
-        self.sat = [0] * num_pixels
-        self.val = [0] * num_pixels
-
-        self.red = [0] * num_pixels
-        self.green = [0] * num_pixels
-        self.blue = [0] * num_pixels
-
-        self.param_updates = queue.Queue()
         self.params = params.Params()
+        self.param_updates = queue.Queue()
         self.frame = 0
+
+        self.hue_vel = [random.random() for _ in range(config.num_pixels)]
+        self.linear_sat_vel = [0] * config.num_pixels
+        self.linear_val_vel = [0] * config.num_pixels
+
+        self.linear_sat = [0] * config.num_pixels
+        self.linear_val = [0] * config.num_pixels
+
+        self.hue = [0] * config.num_pixels
+        self.sat = [0] * config.num_pixels
+        self.val = [0] * config.num_pixels
+
+        self.red = [0] * config.num_pixels
+        self.green = [0] * config.num_pixels
+        self.blue = [0] * config.num_pixels
 
         self.thread = threading.Thread(target=self.run)
         self.thread.start()
@@ -42,7 +44,7 @@ class LightSim:
 
     def run(self):
         rl.init_window(window_size, window_size, "musical lights simulator")
-        rl.set_target_fps(fps)
+        rl.set_target_fps(60)
         rl.clear_background(rl.RAYWHITE)
 
         self.camera_3d = rl.Camera3D(
@@ -66,8 +68,8 @@ class LightSim:
     def update_params(self):
         try:
             self.params = self.param_updates.get(block=False)
-            self.params.s = math.pow(self.params.s, scaling_root)
-            self.params.v = math.pow(self.params.v, scaling_root)
+            self.params.s = math.pow(self.params.s, config.scaling_root)
+            self.params.v = math.pow(self.params.v, config.scaling_root)
         except queue.Empty:
             pass
 
@@ -84,9 +86,9 @@ class LightSim:
 
                 if random.random() < self.params.t:
                     if random.random() > 0.5:
-                        v += delta
+                        v += config.delta
                     else:
-                        v -= delta
+                        v -= config.delta
 
                 # Sometimes the fastest way to get to the target is to decriment
                 # the hue, and wrap around from 0 -> 1. The "inverse target" is
@@ -101,9 +103,9 @@ class LightSim:
                         p += 1
 
                 if (wraps or target == 0.0) and p > target + tolerance:
-                    v -= delta * 0.1
+                    v -= config.delta * 0.1
                 if p < target - tolerance:
-                    v += delta * 0.1
+                    v += config.delta * 0.1
 
                 p += v
                 v *= 0.85  # friction, sensitive
@@ -123,7 +125,7 @@ class LightSim:
             (self.linear_val, self.val),
         ):
             for i, l in enumerate(linear):
-                tuned[i] = math.pow(l, 1.0 / scaling_root)
+                tuned[i] = math.pow(l, 1.0 / config.scaling_root)
 
         for i, (h, s, v) in enumerate(zip(self.hue, self.sat, self.val)):
             r, g, b = colorsys.hsv_to_rgb(h, s, v)
@@ -182,8 +184,8 @@ class LightSim:
         )
 
     def draw_vs_plot(self):
-        s = math.pow(self.params.s, 1.0 / scaling_root)
-        v = math.pow(self.params.v, 1.0 / scaling_root)
+        s = math.pow(self.params.s, 1.0 / config.scaling_root)
+        v = math.pow(self.params.v, 1.0 / config.scaling_root)
         x = 500 + int(s * 500)
         y = int(500 - v * 500)
         rl.draw_line_v([x, 0], [x, 500], rl.DARKGRAY)
@@ -207,7 +209,7 @@ class LightSim:
         y = 250 + int(245 * math.sin((self.params.h + self.params.dh) * 2 * math.pi))
         rl.draw_line_v([250, 250], [x, y], rl.LIGHTGRAY)
 
-        s = math.pow(self.params.s, 1.0 / scaling_root)
+        s = math.pow(self.params.s, 1.0 / config.scaling_root)
         rl.draw_circle_lines(250, 250, 240 * s, rl.LIGHTGRAY)
         rl.draw_circle_lines(250, 250, 240, rl.LIGHTGRAY)
 

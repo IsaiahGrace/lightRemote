@@ -13,10 +13,10 @@ none_track = {"item": {"id": None}, "is_playing": False}
 
 
 class FSM:
-    def __init__(self, spotipy):
+    def __init__(self, spotipy, backend):
         self.sp = spotipy
         self.playing = False
-        self.lights = lights.Lights()
+        self.lights = lights.Lights(backend)
         self.track = none_track
 
     def fetch_track(self):
@@ -68,8 +68,10 @@ class FSM:
         valence = audio["valence"]
         energy = math.pow(audio["energy"], 1)
         danceability = math.pow(audio["danceability"], 1)
+
         print(f"[bold][green]{track_name}[/green] : [blue]{album}[/blue] : [cyan]{artists}[/cyan][/bold]")
         print(f"valence: {audio['valence']:0.4f} energy: {energy:0.4f} danceability: {danceability:0.4f}")
+
         self.lights.set_params(
             params.Params(
                 h=audio["valence"],
@@ -98,7 +100,8 @@ def main(args):
     scope = "user-read-playback-state"
     sp = spotipy.Spotify(auth_manager=SpotifyOAuth(scope=scope))
 
-    fsm = FSM(sp)
+    fsm = FSM(sp, args[1])
+
     try:
         fsm.run()
     except KeyboardInterrupt:
