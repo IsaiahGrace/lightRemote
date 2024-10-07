@@ -4,7 +4,6 @@ import math
 import params
 import pyray as rl
 import queue
-import random
 import threading
 
 window_size = 1000
@@ -63,13 +62,6 @@ class Display:
             pass
 
     def update_rgb(self):
-        for linear, tuned in (
-            (self.algorithm.linear_sat, self.algorithm.sat),
-            (self.algorithm.linear_val, self.algorithm.val),
-        ):
-            for i, l in enumerate(linear):
-                tuned[i] = math.pow(l, 1.0 / config.scaling_root)
-
         for i, (h, s, v) in enumerate(zip(self.algorithm.hue, self.algorithm.sat, self.algorithm.val)):
             r, g, b = colorsys.hsv_to_rgb(h, s, v)
             self.red[i] = int(r * 255)

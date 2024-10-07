@@ -1,22 +1,25 @@
 import math
-import random
+import numpy as np
 
 
 class Algorithm:
     def __init__(self, config, params):
         self.params = params
         self.config = config
+        self.rng = np.random.default_rng()
 
-        self.hue_vel = [random.random() for _ in range(self.config.num_pixels)]
-        self.linear_sat_vel = [0] * self.config.num_pixels
-        self.linear_val_vel = [0] * self.config.num_pixels
+        self.entropy = np.ones(self.config.num_pixels)
 
-        self.linear_sat = [0] * self.config.num_pixels
-        self.linear_val = [0] * self.config.num_pixels
+        self.hue_vel = np.zeros(self.config.num_pixels)
+        self.linear_sat_vel = np.zeros(self.config.num_pixels)
+        self.linear_val_vel = np.zeros(self.config.num_pixels)
 
-        self.hue = [0] * self.config.num_pixels
-        self.sat = [0] * self.config.num_pixels
-        self.val = [0] * self.config.num_pixels
+        self.linear_sat = np.zeros(self.config.num_pixels)
+        self.linear_val = np.zeros(self.config.num_pixels)
+
+        self.hue = self.rng.random(self.config.num_pixels)
+        self.sat = np.zeros(self.config.num_pixels)
+        self.val = np.zeros(self.config.num_pixels)
 
     def set_params(self, params):
         self.params = params
@@ -29,13 +32,14 @@ class Algorithm:
             (self.linear_sat, self.linear_sat_vel, self.params.s, self.params.ds, False),
             (self.linear_val, self.linear_val_vel, self.params.v, self.params.dv, False),
         ):
+            self.rng.random(self.config.num_pixels, out=self.entropy)
             inverse_target = (target + 0.5) % 1
-            for i in range(len(position)):
+            for i in range(self.config.num_pixels):
                 p = position[i]
                 v = velocity[i]
 
-                if random.random() < self.params.t:
-                    if random.random() > 0.5:
+                if self.entropy[i] < self.params.t:
+                    if self.entropy[i] > self.params.t / 2.0:
                         v += self.config.delta
                     else:
                         v -= self.config.delta
@@ -63,8 +67,12 @@ class Algorithm:
                 if wraps:
                     p %= 1
                 else:
-                    p = max(p, 0.0)
-                    p = min(p, 1.0)
+                    p = p if p > 0.0 else 0.0
+                    p = p if p < 1.0 else 1.0
 
                 position[i] = p
                 velocity[i] = v
+
+        for i in range(self.config.num_pixels):
+            self.sat[i] = math.pow(self.linear_sat[i], 1.0 / self.config.scaling_root)
+            self.val[i] = math.pow(self.linear_val[i], 1.0 / self.config.scaling_root)
