@@ -2,11 +2,14 @@ from rich import print
 from spotipy.oauth2 import SpotifyOAuth
 import json
 import lights
+import math
 import os
 import params
 import spotipy
 import sys
 import time
+
+none_track = {"item": {"id": None}, "is_playing": False}
 
 
 class FSM:
@@ -14,15 +17,12 @@ class FSM:
         self.sp = spotipy
         self.playing = False
         self.lights = lights.Lights()
-        self.fetch_track()
+        self.track = none_track
 
     def fetch_track(self):
         self.track = self.sp.current_playback()
         if not self.track:
-            self.track = {
-                "item": {"id": None},
-                "is_playing": False,
-            }
+            self.track = none_track
         if not self.track["item"]:
             self.track["item"] = {"id": None}
 
@@ -32,20 +32,25 @@ class FSM:
             state = state()
 
     def idle(self):
+        old_playing = self.track["is_playing"]
         old_track_id = self.track["item"]["id"]
 
         self.fetch_track()
 
-        if not self.playing and self.track["is_playing"] and self.track["item"]["id"]:
-            self.playing = True
+        new = old_track_id != self.track["item"]["id"]
+        playing = self.track["is_playing"]
+        started = not old_playing and playing
+        stopped = old_playing and not playing
+        valid = self.track["item"]["id"]
+
+        if new and valid and playing:
             return self.start_playback
 
-        if self.playing and not self.track["is_playing"]:
-            self.playing = False
+        if started and valid:
+            return self.start_playback
+
+        if stopped:
             return self.stop_playback
-
-        if old_track_id != self.track["item"]["id"]:
-            return self.start_playback
 
         time.sleep(1)
         return self.idle
@@ -55,15 +60,19 @@ class FSM:
         track_name = self.track["item"]["name"]
         artists = ", ".join(artist["name"] for artist in self.track["item"]["artists"])
         album = self.track["item"]["album"]["name"]
+        valence = audio["valence"]
+        energy = math.pow(audio["energy"], 1)
+        danceability = math.pow(audio["danceability"], 1)
         print(f"[bold][green]{track_name}[/green] : [blue]{album}[/blue] : [cyan]{artists}[/cyan][/bold]")
+        print(f"valence: {audio['valence']:0.4f} energy: {energy:0.4f} danceability: {danceability:0.4f}")
         self.lights.set_params(
             params.Params(
                 h=audio["valence"],
-                s=1.0,
-                v=1.0,
+                s=energy,
+                v=danceability,
                 dh=0.05,
-                ds=0.2,
-                dv=0.2,
+                ds=0.0,
+                dv=0.0,
                 t=0.5,
             )
         )

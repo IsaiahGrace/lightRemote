@@ -8,13 +8,21 @@ import threading
 
 window_size = 1000
 fps = 60
-delta = 1.0 / 1000.0
+delta = 1.0 / 2000.0
 num_pixels = 400
+scaling_root = 2
 
 
 class LightSim:
     def __init__(self):
-        self.hue = [random.random() for _ in range(num_pixels)]
+        self.hue_vel = [random.random() for _ in range(num_pixels)]
+        self.linear_sat_vel = [0] * num_pixels
+        self.linear_val_vel = [0] * num_pixels
+
+        self.linear_sat = [0] * num_pixels
+        self.linear_val = [0] * num_pixels
+
+        self.hue = [0] * num_pixels
         self.sat = [0] * num_pixels
         self.val = [0] * num_pixels
 
@@ -50,6 +58,7 @@ class LightSim:
             self.frame += 1
             self.update_params()
             self.update_pixels()
+            self.update_rgb()
             self.render()
         rl.unload_render_texture(self.texture_3d)
         rl.close_window()
@@ -57,23 +66,27 @@ class LightSim:
     def update_params(self):
         try:
             self.params = self.param_updates.get(block=False)
+            self.params.s = math.pow(self.params.s, scaling_root)
+            self.params.v = math.pow(self.params.v, scaling_root)
         except queue.Empty:
             pass
 
     def update_pixels(self):
-        for component, target, tolerance, wraps in (
-            (self.hue, self.params.h, self.params.dh, True),
-            (self.sat, self.params.s, self.params.ds, False),
-            (self.val, self.params.v, self.params.dv, False),
+        for position, velocity, target, tolerance, wraps in (
+            (self.hue, self.hue_vel, self.params.h, self.params.dh, True),
+            (self.linear_sat, self.linear_sat_vel, self.params.s, self.params.ds, False),
+            (self.linear_val, self.linear_val_vel, self.params.v, self.params.dv, False),
         ):
             inverse_target = (target + 0.5) % 1
-            for i in range(len(component)):
-                c = component[i]
+            for i in range(len(position)):
+                p = position[i]
+                v = velocity[i]
+
                 if random.random() < self.params.t:
                     if random.random() > 0.5:
-                        c += delta
+                        v += delta
                     else:
-                        c -= delta
+                        v -= delta
 
                 # Sometimes the fastest way to get to the target is to decriment
                 # the hue, and wrap around from 0 -> 1. The "inverse target" is
@@ -82,25 +95,36 @@ class LightSim:
                 # values at the end of this function, the offset here doesn't
                 # effect the final value.
                 if wraps:
-                    if inverse_target > target and c > inverse_target:
-                        c -= 1
-                    elif inverse_target < target and c < inverse_target:
-                        c += 1
+                    if inverse_target > target and p > inverse_target:
+                        p -= 1
+                    elif inverse_target < target and p < inverse_target:
+                        p += 1
 
-                if c > target + tolerance:
-                    c -= delta * 0.5
-                if c < target - tolerance:
-                    c += delta * 0.5
+                if (wraps or target == 0.0) and p > target + tolerance:
+                    v -= delta * 0.1
+                if p < target - tolerance:
+                    v += delta * 0.1
+
+                p += v
+                v *= 0.85  # friction, sensitive
 
                 if wraps:
-                    c %= 1
+                    p %= 1
                 else:
-                    c = max(c, 0.0)
-                    c = min(c, 1.0)
+                    p = max(p, 0.0)
+                    p = min(p, 1.0)
 
-                component[i] = c
+                position[i] = p
+                velocity[i] = v
 
     def update_rgb(self):
+        for linear, tuned in (
+            (self.linear_sat, self.sat),
+            (self.linear_val, self.val),
+        ):
+            for i, l in enumerate(linear):
+                tuned[i] = math.pow(l, 1.0 / scaling_root)
+
         for i, (h, s, v) in enumerate(zip(self.hue, self.sat, self.val)):
             r, g, b = colorsys.hsv_to_rgb(h, s, v)
             self.red[i] = int(r * 255)
@@ -108,7 +132,6 @@ class LightSim:
             self.blue[i] = int(b * 255)
 
     def render(self):
-        self.update_rgb()
         rl.begin_drawing()
         rl.clear_background(rl.RAYWHITE)
 
@@ -159,22 +182,39 @@ class LightSim:
         )
 
     def draw_vs_plot(self):
+        s = math.pow(self.params.s, 1.0 / scaling_root)
+        v = math.pow(self.params.v, 1.0 / scaling_root)
+        x = 500 + int(s * 500)
+        y = int(500 - v * 500)
+        rl.draw_line_v([x, 0], [x, 500], rl.DARKGRAY)
+        rl.draw_line_v([500, y], [1000, y], rl.DARKGRAY)
+
         for r, g, b, s, v in zip(self.red, self.green, self.blue, self.sat, self.val):
             x = 500 + int(s * 500)
             y = int(500 - v * 500)
             rl.draw_circle(x, y, 5, [r, g, b, 255])
 
     def draw_hs_plot(self):
+        x = 250 + int(245 * math.cos(self.params.h * 2 * math.pi))
+        y = 250 + int(245 * math.sin(self.params.h * 2 * math.pi))
+        rl.draw_line_v([250, 250], [x, y], rl.DARKGRAY)
+
+        x = 250 + int(245 * math.cos((self.params.h - self.params.dh) * 2 * math.pi))
+        y = 250 + int(245 * math.sin((self.params.h - self.params.dh) * 2 * math.pi))
+        rl.draw_line_v([250, 250], [x, y], rl.LIGHTGRAY)
+
+        x = 250 + int(245 * math.cos((self.params.h + self.params.dh) * 2 * math.pi))
+        y = 250 + int(245 * math.sin((self.params.h + self.params.dh) * 2 * math.pi))
+        rl.draw_line_v([250, 250], [x, y], rl.LIGHTGRAY)
+
+        s = math.pow(self.params.s, 1.0 / scaling_root)
+        rl.draw_circle_lines(250, 250, 240 * s, rl.LIGHTGRAY)
+        rl.draw_circle_lines(250, 250, 240, rl.LIGHTGRAY)
+
         for r, g, b, h, s in zip(self.red, self.green, self.blue, self.hue, self.sat):
             x = 250 + int(240 * s * math.cos(h * 2 * math.pi))
             y = 250 + int(240 * s * math.sin(h * 2 * math.pi))
             rl.draw_circle(x, y, 5, [r, g, b, 255])
-
-        rl.draw_circle_lines(250, 250, 240, rl.LIGHTGRAY)
-        rl.draw_line_v([250, 250], [300, 250], rl.LIGHTGRAY)
-        x = 250 + int(245 * self.params.s * math.cos(self.params.h * 2 * math.pi))
-        y = 250 + int(245 * self.params.s * math.sin(self.params.h * 2 * math.pi))
-        rl.draw_line_v([250, 250], [x, y], rl.DARKGRAY)
 
     def draw_preview(self):
         pixel_size = 25
@@ -190,23 +230,10 @@ class LightSim:
         rl.begin_mode_3d(self.camera_3d)
 
         rl.draw_cylinder_wires([0, -1, 0], 1, 1, 1, 16, rl.LIGHTGRAY)
-        rl.draw_line_3d(
-            [0, -self.params.v, 0],
-            [
-                self.params.s * math.cos(self.params.h * 2 * math.pi),
-                -self.params.v,
-                self.params.s * math.sin(self.params.h * 2 * math.pi),
-            ],
-            rl.DARKGRAY,
-        )
 
         for r, g, b, h, s, v in zip(self.red, self.green, self.blue, self.hue, self.sat, self.val):
             rl.draw_cube_v(
-                [
-                    s * math.cos(h * 2 * math.pi),
-                    -v,
-                    s * math.sin(h * 2 * math.pi),
-                ],
+                [s * math.cos(h * 2 * math.pi), -v, s * math.sin(h * 2 * math.pi)],
                 [0.05, 0.05, 0.05],
                 [r, g, b, 255],
             )
