@@ -34,14 +34,16 @@ class FSM:
     def idle(self):
         old_playing = self.track["is_playing"]
         old_track_id = self.track["item"]["id"]
+        old_valid = self.track["item"]["id"]
 
         self.fetch_track()
 
         new = old_track_id != self.track["item"]["id"]
         playing = self.track["is_playing"]
         started = not old_playing and playing
-        stopped = old_playing and not playing
+        stopped = old_valid and old_playing and not playing
         valid = self.track["item"]["id"]
+        invalidated = old_valid and not valid
 
         if new and valid and playing:
             return self.start_playback
@@ -50,6 +52,9 @@ class FSM:
             return self.start_playback
 
         if stopped:
+            return self.stop_playback
+
+        if invalidated:
             return self.stop_playback
 
         time.sleep(1)
