@@ -11,7 +11,8 @@ window_size = 1000
 config = params.Config(
     delta=(1.0 / 2000.0),
     num_pixels=400,
-    scaling_root=2.0,
+    scaling_root=1.2,
+    restoring_force=0.1,
 )
 
 

@@ -6,12 +6,13 @@ import pyray as rl
 import queue
 import threading
 
-pixel_size = 25
+pixel_size = 50
 
 config = params.Config(
     delta=(1.0 / 2000.0),
     num_pixels=0,
-    scaling_root=2.0,
+    scaling_root=1.2,
+    restoring_force=0.1,
 )
 
 

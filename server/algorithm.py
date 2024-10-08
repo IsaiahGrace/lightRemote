@@ -23,8 +23,8 @@ class Algorithm:
 
     def set_params(self, params):
         self.params = params
-        self.params.s = math.pow(self.params.s, self.config.scaling_root)
-        self.params.v = math.pow(self.params.v, self.config.scaling_root)
+        self.params.s = math.pow(self.params.s, 1.0 / self.config.scaling_root)
+        self.params.v = math.pow(self.params.v, 1.0 / self.config.scaling_root)
 
     def update(self):
         for position, velocity, target, tolerance, wraps in (
@@ -37,12 +37,13 @@ class Algorithm:
             for i in range(self.config.num_pixels):
                 p = position[i]
                 v = velocity[i]
+                f = 0.0
 
                 if self.entropy[i] < self.params.t:
                     if self.entropy[i] > self.params.t / 2.0:
-                        v += self.config.delta
+                        f += self.config.delta
                     else:
-                        v -= self.config.delta
+                        f -= self.config.delta
 
                 # Sometimes the fastest way to get to the target is to decriment
                 # the hue, and wrap around from 0 -> 1. The "inverse target" is
@@ -57,12 +58,13 @@ class Algorithm:
                         p += 1
 
                 if (wraps or target == 0.0) and p > target + tolerance:
-                    v -= self.config.delta * 0.1
+                    f -= self.config.delta * self.config.restoring_force
                 if p < target - tolerance:
-                    v += self.config.delta * 0.1
+                    f += self.config.delta * self.config.restoring_force
 
+                v += f / self.config.mass
                 p += v
-                v *= 0.85  # friction, sensitive
+                v *= 0.985  # friction, sensitive
 
                 if wraps:
                     p %= 1

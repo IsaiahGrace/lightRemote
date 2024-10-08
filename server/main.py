@@ -66,21 +66,21 @@ class FSM:
         artists = ", ".join(artist["name"] for artist in self.track["item"]["artists"])
         album = self.track["item"]["album"]["name"]
         valence = audio["valence"]
-        energy = math.pow(audio["energy"], 1)
-        danceability = math.pow(audio["danceability"], 1)
+        energy = audio["energy"]
+        danceability = audio["danceability"]
 
         print(f"[bold][green]{track_name}[/green] : [blue]{album}[/blue] : [cyan]{artists}[/cyan][/bold]")
-        print(f"valence: {audio['valence']:0.4f} energy: {energy:0.4f} danceability: {danceability:0.4f}")
+        print(f"valence: {valence:0.4f} energy: {energy:0.4f} danceability: {danceability:0.4f}")
 
         self.lights.set_params(
             params.Params(
-                h=audio["valence"],
+                h=valence,
                 s=energy,
                 v=danceability,
                 dh=0.05,
                 ds=0.0,
                 dv=0.0,
-                t=0.5,
+                t=0.15,
             )
         )
         return self.idle

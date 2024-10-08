@@ -17,3 +17,5 @@ class Config:
     delta: float = 1.0 / 2000.0
     num_pixels: int = 400
     scaling_root: float = 2.0
+    restoring_force: float = 0.1
+    mass: float = 5.0
