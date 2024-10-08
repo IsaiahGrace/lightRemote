@@ -8,7 +8,7 @@ class Algorithm:
         self.config = config
         self.rng = np.random.default_rng()
 
-        self.entropy = np.ones(self.config.num_pixels)
+        self.force = np.ones(self.config.num_pixels)
 
         self.hue_vel = np.zeros(self.config.num_pixels)
         self.linear_sat_vel = np.zeros(self.config.num_pixels)
@@ -32,49 +32,50 @@ class Algorithm:
             (self.linear_sat, self.linear_sat_vel, self.params.s, self.params.ds, False),
             (self.linear_val, self.linear_val_vel, self.params.v, self.params.dv, False),
         ):
-            self.rng.random(self.config.num_pixels, out=self.entropy)
+            # Sometimes the fastest way to get to the target is to decriment
+            # the hue, and wrap around from 0 -> 1. The "inverse target" is
+            # the opposite point on the hue circle. By adding or subtracting
+            # 1, we make the comparisons below simpler. Because we wrap the
+            # values at the end of this function, the offset here doesn't
+            # effect the final value.
             inverse_target = (target + 0.5) % 1
-            for i in range(self.config.num_pixels):
-                p = position[i]
-                v = velocity[i]
-                f = 0.0
-
-                if self.entropy[i] < self.params.t:
-                    if self.entropy[i] > self.params.t / 2.0:
-                        f += self.config.delta
-                    else:
-                        f -= self.config.delta
-
-                # Sometimes the fastest way to get to the target is to decriment
-                # the hue, and wrap around from 0 -> 1. The "inverse target" is
-                # the opposite point on the hue circle. By adding or subtracting
-                # 1, we make the comparisons below simpler. Because we wrap the
-                # values at the end of this function, the offset here doesn't
-                # effect the final value.
-                if wraps:
-                    if inverse_target > target and p > inverse_target:
-                        p -= 1
-                    elif inverse_target < target and p < inverse_target:
-                        p += 1
-
-                if (wraps or target == 0.0) and p > target + tolerance:
-                    f -= self.config.delta * self.config.restoring_force
-                if p < target - tolerance:
-                    f += self.config.delta * self.config.restoring_force
-
-                v += f / self.config.mass
-                p += v
-                v *= 0.985  # friction, sensitive
-
-                if wraps:
-                    p %= 1
+            if wraps:
+                if inverse_target > target:
+                    np.subtract(position, 1.0, where=position > inverse_target, out=position)
                 else:
-                    p = p if p > 0.0 else 0.0
-                    p = p if p < 1.0 else 1.0
+                    np.add(position, 1.0, where=position < inverse_target, out=position)
 
-                position[i] = p
-                velocity[i] = v
+            # Calculate random forces on the pixel due to temperature
+            self.rng.random(self.config.num_pixels, out=self.force)
+            np.subtract(self.force, self.params.t, out=self.force)
+            np.clip(self.force, None, 0.0, out=self.force)
+            np.add(self.force, self.params.t / 2.0, where=self.force != 0, out=self.force)
+            np.sign(self.force, out=self.force)
+            np.multiply(self.force, self.config.delta, out=self.force)
 
-        for i in range(self.config.num_pixels):
-            self.sat[i] = math.pow(self.linear_sat[i], 1.0 / self.config.scaling_root)
-            self.val[i] = math.pow(self.linear_val[i], 1.0 / self.config.scaling_root)
+            # Apply restoring forces
+            restoring_delta = self.config.delta * self.config.restoring_force
+            if wraps or target == 0.0:
+                np.subtract(self.force, restoring_delta, where=position > target + tolerance, out=self.force)
+
+            np.add(self.force, restoring_delta, where=position < target - tolerance, out=self.force)
+
+            # Acceleration = Force / Mass
+            np.divide(self.force, self.config.mass, out=self.force)
+
+            # Velocity += Acceleration
+            np.add(velocity, self.force, out=velocity)
+
+            # Position += Velocity
+            np.add(position, velocity, out=position)
+
+            # Velocity *= friction
+            np.multiply(velocity, self.config.friction, out=velocity)
+
+            if wraps:
+                np.mod(position, 1.0, out=position)
+            else:
+                np.clip(position, 0.0, 1.0, out=position)
+
+        np.power(self.linear_sat, 1.0 / self.config.scaling_root, out=self.sat)
+        np.power(self.linear_val, 1.0 / self.config.scaling_root, out=self.val)

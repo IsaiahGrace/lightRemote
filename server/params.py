@@ -19,3 +19,4 @@ class Config:
     scaling_root: float = 2.0
     restoring_force: float = 0.1
     mass: float = 5.0
+    friction: float = 1 - 0.015
