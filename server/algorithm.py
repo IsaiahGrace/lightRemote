@@ -21,6 +21,10 @@ class Algorithm:
         self.sat = np.zeros(self.config.num_pixels)
         self.val = np.zeros(self.config.num_pixels)
 
+        self.hue_snake = np.full(self.config.num_pixels, self.hue[0])
+        self.sat_snake = np.zeros(self.config.num_pixels)
+        self.val_snake = np.zeros(self.config.num_pixels)
+
     def set_params(self, params):
         self.params = params
         self.params.s = math.pow(self.params.s, 1.0 / self.config.scaling_root)
@@ -79,3 +83,10 @@ class Algorithm:
 
         np.power(self.linear_sat, 1.0 / self.config.scaling_root, out=self.sat)
         np.power(self.linear_val, 1.0 / self.config.scaling_root, out=self.val)
+
+        self.hue_snake = np.roll(self.hue_snake, 1)
+        self.sat_snake = np.roll(self.sat_snake, 1)
+        self.val_snake = np.roll(self.val_snake, 1)
+        self.hue_snake[0] = self.hue[0]
+        self.sat_snake[0] = self.sat[0]
+        self.val_snake[0] = self.val[0]

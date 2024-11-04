@@ -64,7 +64,9 @@ class Display:
             pass
 
     def update_rgb(self):
-        for i, (h, s, v) in enumerate(zip(self.algorithm.hue, self.algorithm.sat, self.algorithm.val)):
+        for i, (h, s, v) in enumerate(
+            zip(self.algorithm.hue_snake, self.algorithm.sat_snake, self.algorithm.val_snake)
+        ):
             r, g, b = colorsys.hsv_to_rgb(h, s, v)
             self.red[i] = r * 255
             self.green[i] = g * 255
@@ -88,7 +90,7 @@ class Display:
 
     def draw_h_line(self):
         params = self.algorithm.params
-        for r, g, b, h in zip(self.red, self.green, self.blue, self.algorithm.hue):
+        for r, g, b, h in zip(self.red, self.green, self.blue, self.algorithm.hue_snake):
             rl.draw_circle(540 + int(h * 440), 900, 6, [r, g, b, 255])
 
         # main axis, ticks at 0 & 1
@@ -134,7 +136,7 @@ class Display:
         rl.draw_line_v([x, 0], [x, 500], rl.DARKGRAY)
         rl.draw_line_v([500, y], [1000, y], rl.DARKGRAY)
 
-        for r, g, b, s, v in zip(self.red, self.green, self.blue, self.algorithm.sat, self.algorithm.val):
+        for r, g, b, s, v in zip(self.red, self.green, self.blue, self.algorithm.sat_snake, self.algorithm.val_snake):
             x = 500 + int(s * 500)
             y = int(500 - v * 500)
             rl.draw_circle(x, y, 5, [r, g, b, 255])
@@ -157,7 +159,7 @@ class Display:
         rl.draw_circle_lines(250, 250, 240 * s, rl.LIGHTGRAY)
         rl.draw_circle_lines(250, 250, 240, rl.LIGHTGRAY)
 
-        for r, g, b, h, s in zip(self.red, self.green, self.blue, self.algorithm.hue, self.algorithm.sat):
+        for r, g, b, h, s in zip(self.red, self.green, self.blue, self.algorithm.hue_snake, self.algorithm.sat_snake):
             x = 250 + int(240 * s * math.cos(h * 2 * math.pi))
             y = 250 + int(240 * s * math.sin(h * 2 * math.pi))
             rl.draw_circle(x, y, 5, [r, g, b, 255])
@@ -181,9 +183,9 @@ class Display:
             self.red,
             self.green,
             self.blue,
-            self.algorithm.hue,
-            self.algorithm.sat,
-            self.algorithm.val,
+            self.algorithm.hue_snake,
+            self.algorithm.sat_snake,
+            self.algorithm.val_snake,
         ):
             rl.draw_cube_v(
                 [s * math.cos(h * 2 * math.pi), -v, s * math.sin(h * 2 * math.pi)],

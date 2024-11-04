@@ -72,7 +72,9 @@ class Display:
             pass
 
     def update_rgb(self):
-        for i, (h, s, v) in enumerate(zip(self.algorithm.hue, self.algorithm.sat, self.algorithm.val)):
+        for i, (h, s, v) in enumerate(
+            zip(self.algorithm.hue_snake, self.algorithm.sat_snake, self.algorithm.val_snake)
+        ):
             r, g, b = colorsys.hsv_to_rgb(h, s, v)
             self.red[i] = r * 255
             self.green[i] = g * 255
