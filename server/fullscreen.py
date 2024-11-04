@@ -1,6 +1,7 @@
 import algorithm
 import colorsys
 import math
+import numpy as np
 import params
 import pyray as rl
 import queue
@@ -48,9 +49,9 @@ class Display:
 
         self.algorithm = algorithm.Algorithm(config, params.Params())
 
-        self.red = [0] * config.num_pixels
-        self.green = [0] * config.num_pixels
-        self.blue = [0] * config.num_pixels
+        self.red = np.zeros(config.num_pixels, dtype=np.uint8)
+        self.green = np.zeros(config.num_pixels, dtype=np.uint8)
+        self.blue = np.zeros(config.num_pixels, dtype=np.uint8)
 
         self.run()
 
@@ -73,9 +74,9 @@ class Display:
     def update_rgb(self):
         for i, (h, s, v) in enumerate(zip(self.algorithm.hue, self.algorithm.sat, self.algorithm.val)):
             r, g, b = colorsys.hsv_to_rgb(h, s, v)
-            self.red[i] = int(r * 255)
-            self.green[i] = int(g * 255)
-            self.blue[i] = int(b * 255)
+            self.red[i] = r * 255
+            self.green[i] = g * 255
+            self.blue[i] = b * 255
 
     def update_fullscreen(self):
         if rl.is_key_pressed(rl.KEY_SPACE):
