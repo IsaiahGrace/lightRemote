@@ -8,18 +8,18 @@ class Algorithm:
         self.config = config
         self.rng = np.random.default_rng()
 
-        self.force = np.ones(self.config.num_pixels)
+        self.force = np.ones(1)
 
-        self.hue_vel = np.zeros(self.config.num_pixels)
-        self.linear_sat_vel = np.zeros(self.config.num_pixels)
-        self.linear_val_vel = np.zeros(self.config.num_pixels)
+        self.hue_vel = np.zeros(1)
+        self.linear_sat_vel = np.zeros(1)
+        self.linear_val_vel = np.zeros(1)
 
-        self.linear_sat = np.zeros(self.config.num_pixels)
-        self.linear_val = np.zeros(self.config.num_pixels)
+        self.linear_sat = np.zeros(1)
+        self.linear_val = np.zeros(1)
 
-        self.hue = self.rng.random(self.config.num_pixels)
-        self.sat = np.zeros(self.config.num_pixels)
-        self.val = np.zeros(self.config.num_pixels)
+        self.hue = self.rng.random(1)
+        self.sat = np.zeros(1)
+        self.val = np.zeros(1)
 
         self.hue_snake = np.full(self.config.num_pixels, self.hue[0])
         self.sat_snake = np.zeros(self.config.num_pixels)
@@ -50,7 +50,7 @@ class Algorithm:
                     np.add(position, 1.0, where=position < inverse_target, out=position)
 
             # Calculate random forces on the pixel due to temperature
-            self.rng.random(self.config.num_pixels, out=self.force)
+            self.rng.random(1, out=self.force)
             np.subtract(self.force, self.params.t, out=self.force)
             np.clip(self.force, None, 0.0, out=self.force)
             np.add(self.force, self.params.t / 2.0, where=self.force != 0, out=self.force)
