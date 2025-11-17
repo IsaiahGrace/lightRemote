@@ -1,5 +1,6 @@
 from rich import print
 from spotipy.oauth2 import SpotifyOAuth
+import functools
 import json
 import lights
 import math
@@ -8,6 +9,7 @@ import params
 import spotipy
 import sys
 import time
+import zlib
 
 none_track = {"item": {"id": None}, "is_playing": False}
 
@@ -61,22 +63,35 @@ class FSM:
         return self.idle
 
     def start_playback(self):
-        audio = self.sp.audio_features(self.track["item"]["id"])[0]
         track_name = self.track["item"]["name"]
-        artists = ", ".join(artist["name"] for artist in self.track["item"]["artists"])
+        artist_names = ", ".join(artist["name"] for artist in self.track["item"]["artists"])
         album = self.track["item"]["album"]["name"]
-        valence = audio["valence"]
-        energy = audio["energy"]
-        danceability = audio["danceability"]
 
-        print(f"[bold][green]{track_name}[/green] : [blue]{album}[/blue] : [cyan]{artists}[/cyan][/bold]")
-        print(f"valence: {valence:0.4f} energy: {energy:0.4f} danceability: {danceability:0.4f}")
+        artists = [self.sp.artist(a["id"]) for a in self.track["item"]["artists"]]
+        genres = set()
+        for a in artists:
+            for g in a["genres"]:
+                genres.add(g)
+            if not a["genres"]:
+                genres.add(a["name"])
+
+        genre_hash = functools.reduce(
+            lambda a, b: a ^ b,
+            (zlib.crc32(g.encode("utf-8")) for g in genres),
+        )
+        hue = float(genre_hash & 0x0000FF) / float(0x0000FF)
+        sat = float(genre_hash & 0x00FF00) / float(0x00FF00)
+        val = float(genre_hash & 0xFF0000) / float(0xFF0000)
+
+        print(f"[bold][green]{track_name}[/green] : [blue]{album}[/blue] : [cyan]{artist_names}[/cyan][/bold]")
+        print(f"[bold purple]Artist genres: {', '.join(genres)}")
+        print(f"[bold red]{hue} {sat} {val}")
 
         self.lights.set_params(
             params.Params(
-                h=valence,
-                s=energy,
-                v=danceability,
+                h=hue,
+                s=sat,
+                v=val,
                 dh=0.05,
                 ds=0.0,
                 dv=0.0,
