@@ -1,5 +1,6 @@
 / {
     aliases {
-        my-led = &green_led;
+        my-red-led = &red_led;
+        my-green-led = &green_led;
     };
 };
