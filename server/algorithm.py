@@ -32,7 +32,7 @@ class Algorithm:
             (self.linear_sat, self.linear_sat_vel, self.params.s, self.params.ds, False),
             (self.linear_val, self.linear_val_vel, self.params.v, self.params.dv, False),
         ):
-            # Sometimes the fastest way to get to the target is to decriment
+            # Sometimes the fastest way to get to the target is to decrement
             # the hue, and wrap around from 0 -> 1. The "inverse target" is
             # the opposite point on the hue circle. By adding or subtracting
             # 1, we make the comparisons below simpler. Because we wrap the
