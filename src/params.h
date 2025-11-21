@@ -1,8 +1,14 @@
 #pragma once
 
-#include <stdint.h>
+#include <zephyr/device.h>
 
-#define NUM_PIXELS 400
+#if DT_NODE_HAS_PROP(DT_ALIAS(led_strip), chain_length)
+#define STRIP_NUM_PIXELS DT_PROP(DT_ALIAS(led_strip), chain_length)
+#else
+#error Unable to determine length of LED strip
+#endif
+
+#define NUM_PIXELS STRIP_NUM_PIXELS
 
 typedef struct {
     float hue;
@@ -21,4 +27,3 @@ typedef struct {
     float mass;
     float friction;
 } Config;
-
