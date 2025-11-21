@@ -15,8 +15,8 @@ LOG_MODULE_REGISTER(main);
 #include "algorithm.h"
 #include "params.h"
 
-static const struct gpio_dt_spec red_led = GPIO_DT_SPEC_GET(DT_ALIAS(my_red_led), gpios);
-static const struct gpio_dt_spec green_led = GPIO_DT_SPEC_GET(DT_ALIAS(my_green_led), gpios);
+static const struct gpio_dt_spec red_led = GPIO_DT_SPEC_GET(DT_ALIAS(red_led), gpios);
+static const struct gpio_dt_spec green_led = GPIO_DT_SPEC_GET(DT_ALIAS(green_led), gpios);
 
 #define STRIP_NODE DT_ALIAS(led_strip)
 
