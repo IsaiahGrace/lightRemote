@@ -44,10 +44,10 @@ Params TheParams = {
     .hue = 0.0,
     .sat = 1.0,
     .val = 1.0,
-    .dh = 0.25,
+    .dh = 0.1,
     .ds = 0.1,
     .dv = 0.1,
-    .temp = 0.05,
+    .temp = 0.15,
 };
 
 Algorithm TheAlgorithm;
@@ -127,9 +127,9 @@ int main(void)
             float blu = TheAlgorithm.val[i] * mix(1.0f, constrain(absf(fract(TheAlgorithm.hue[i] + 0.3333333f) * 6.0f - 3.0f) - 1.0f, 0.0f, 1.0f), TheAlgorithm.sat[i]);
 
             // When I scale all the way to 256, the pixels glitch out. Voltage drop? SPI timing?
-            pixels[i].r = red * 200;
-            pixels[i].g = grn * 200;
-            pixels[i].b = blu * 200;
+            pixels[i].r = red * 100;
+            pixels[i].g = grn * 100;
+            pixels[i].b = blu * 100;
         }
 
         led_strip_update_rgb(strip, pixels, STRIP_NUM_PIXELS);
