@@ -1,0 +1,29 @@
+// See build/zephyr/zephyr.dts for the full compiled device tree.
+
+#include <zephyr/dt-bindings/led/led.h>
+
+/ {
+    aliases {
+        green-led = &green_led;
+        led-strip = &led_strip;
+        red-led = &red_led;
+    };
+};
+
+&flexcomm6_lpspi6 {
+    status = "okay";
+
+    led_strip: ws2812@0 {
+        status = "okay";
+        compatible = "worldsemi,ws2812-spi";
+        reg = <0>;
+        spi-max-frequency = <6400000>;
+
+        chain-length = <150>;
+        spi-one-frame = <0xF0>;
+        spi-zero-frame = <0xC0>;
+        color-mapping = <LED_COLOR_ID_GREEN
+                         LED_COLOR_ID_RED
+                         LED_COLOR_ID_BLUE>;
+    };
+};
