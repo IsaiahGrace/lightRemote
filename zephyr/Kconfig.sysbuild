@@ -1,5 +1,0 @@
-source "share/sysbuild/Kconfig"
-
-config REMOTE_BOARD
-    string "Remote board"
-    default "frdm_mcxn947/mcxn947/cpu1" if $(BOARD) = "frdm_mcxn947"

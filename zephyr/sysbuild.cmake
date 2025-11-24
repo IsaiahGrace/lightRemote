@@ -1,8 +1,5 @@
-set(REMOTE_APP remote)
-
 ExternalZephyrProject_Add(
-  APPLICATION ${REMOTE_APP}
-  SOURCE_DIR  ${APP_DIR}/${REMOTE_APP}
-  BOARD       ${SB_CONFIG_REMOTE_BOARD}
-  BOARD_REVISION ${BOARD_REVISION}
+  APPLICATION cpu1
+  SOURCE_DIR  ${APP_DIR}/cpu1
+  BOARD       frdm_mcxn947/mcxn947/cpu1
 )
