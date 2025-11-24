@@ -8,6 +8,12 @@
         led-strip = &led_strip;
         red-led = &red_led;
     };
+
+    mbox-consumer {
+        compatible = "vnd,mbox-consumer";
+        mboxes = <&mbox 1>, <&mbox 0>;
+        mbox-names = "tx", "rx";
+    };
 };
 
 &flexcomm6_lpspi6 {

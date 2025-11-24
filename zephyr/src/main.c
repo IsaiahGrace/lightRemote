@@ -4,8 +4,10 @@
 #include <zephyr/device.h>
 #include <zephyr/drivers/gpio.h>
 #include <zephyr/drivers/led_strip.h>
+#include <zephyr/drivers/mbox.h>
 #include <zephyr/drivers/spi.h>
 #include <zephyr/kernel.h>
+#include <zephyr/sys/printk.h>
 #include <zephyr/sys/util.h>
 
 #define LOG_LEVEL 4
@@ -31,6 +33,15 @@ static const struct gpio_dt_spec green_led = GPIO_DT_SPEC_GET(DT_ALIAS(green_led
 static struct led_rgb pixels[STRIP_NUM_PIXELS];
 
 static const struct device* const strip = DEVICE_DT_GET(STRIP_NODE);
+
+static void callback(const struct device* dev,
+                     mbox_channel_id_t channel_id,
+                     void* user_data,
+                     struct mbox_msg* data)
+{
+    gpio_pin_set_dt(&red_led, 0);
+    // gpio_pin_toggle_dt(&green_led);
+}
 
 Config TheConfig = {
     .delta = 1.0 / 2000.0,
@@ -89,6 +100,8 @@ float absf(float x)
 
 int main(void)
 {
+    printk("CPU0 main()\n");
+
     int ret;
 
     if (!gpio_is_ready_dt(&red_led) || !gpio_is_ready_dt(&green_led)) {
@@ -114,11 +127,29 @@ int main(void)
         return 0;
     }
 
+    const struct mbox_dt_spec rx_channel = MBOX_DT_SPEC_GET(DT_PATH(mbox_consumer), rx);
+    const struct mbox_dt_spec tx_channel = MBOX_DT_SPEC_GET(DT_PATH(mbox_consumer), tx);
+
+    printk("Maximum RX channels: %d\n", mbox_max_channels_get_dt(&rx_channel));
+
+    ret = mbox_register_callback_dt(&rx_channel, callback, NULL);
+    if (ret < 0) {
+        return 0;
+    }
+
+    ret = mbox_set_enabled_dt(&rx_channel, true);
+    if (ret < 0) {
+        return 0;
+    }
+
+    printk("Maximum bytes of data in the TX message: %d\n", mbox_mtu_get_dt(&tx_channel));
+    printk("Maximum TX channels: %d\n", mbox_max_channels_get_dt(&tx_channel));
+
     algorithm_init(&TheAlgorithm, &TheConfig, &TheParams);
 
-    while (1) {
-        gpio_pin_toggle_dt(&red_led);
+    gpio_pin_set_dt(&red_led, 0);
 
+    while (1) {
         algorithm_update(&TheAlgorithm);
 
         for (size_t i = 0; i < ARRAY_SIZE(pixels); i++) {
@@ -133,6 +164,14 @@ int main(void)
         }
 
         led_strip_update_rgb(strip, pixels, STRIP_NUM_PIXELS);
+
+        ret = mbox_send_dt(&tx_channel, NULL);
+        if (ret) {
+            return 0;
+        }
+        gpio_pin_set_dt(&red_led, 1);
+
+        k_msleep(2000);
     }
 
     return 0;
