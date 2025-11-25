@@ -1,0 +1,5 @@
+source "share/sysbuild/Kconfig"
+
+config SECONDARY_BOARD
+    string "Second CPU"
+    default "frdm_mcxn947/mcxn947/cpu1" if $(BOARD) = "frdm_mcxn947"
